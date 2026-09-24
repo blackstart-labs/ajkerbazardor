@@ -50,6 +50,19 @@ export const unitSchema = z.object({
 
 export type Unit = z.infer<typeof unitSchema>;
 
+// ── GroupMap ─────────────────────────────────────────────────────────────────
+
+export const groupMapSchema = z.object({
+  id: z.number().int().positive(),
+  sourceGroupKey: z.string().min(1).max(100),
+  categoryId: z.number().int().positive(),
+});
+
+export type GroupMap = z.infer<typeof groupMapSchema>;
+
+export const createGroupMapSchema = groupMapSchema.omit({ id: true });
+export const updateGroupMapSchema = createGroupMapSchema.partial();
+
 // ── Product ──────────────────────────────────────────────────────────────────
 
 export const productSchema = z.object({
@@ -196,3 +209,38 @@ export const dashboardSummarySchema = z.object({
 });
 
 export type DashboardSummary = z.infer<typeof dashboardSummarySchema>;
+
+// ── Audit Log ─────────────────────────────────────────────────────────────────
+
+export const auditLogSchema = z.object({
+  id: z.number().int().positive(),
+  userId: z.number().int().positive().nullable(),
+  action: z.string(),
+  entity: z.string(),
+  entityId: z.number().int().positive().nullable(),
+  diff: z.string().nullable(),
+  at: z.string(),
+});
+
+export type AuditLog = z.infer<typeof auditLogSchema>;
+
+// ── Admin helpers ─────────────────────────────────────────────────────────────
+
+export const reorderCategoriesSchema = z.object({
+  orders: z.array(
+    z.object({
+      id: z.number().int().positive(),
+      sortOrder: z.number().int(),
+    }),
+  ),
+});
+
+export type ReorderCategoriesDto = z.infer<typeof reorderCategoriesSchema>;
+
+export const approveProductSchema = z.object({
+  categoryId: z.number().int().positive().optional(),
+  unitId: z.number().int().positive().optional(),
+  nameBn: z.string().min(1).max(150).optional(),
+});
+
+export type ApproveProductDto = z.infer<typeof approveProductSchema>;

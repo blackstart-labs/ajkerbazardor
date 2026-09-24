@@ -317,10 +317,21 @@ export class ImportService {
     return { previousRevisionId: prevRev.id };
   }
 
+  async undoRevisionById(revisionId: number, userId: number) {
+    const [rev] = await this.db.select().from(revisions).where(eq(revisions.id, revisionId)).limit(1);
+
+    if (!rev) {
+      throw new BadRequestException(`Revision ${revisionId} not found`);
+    }
+
+    return this.undoRevision(rev.reportId, userId);
+  }
+
   async getRevisions(reportId: number) {
     return this.db
       .select({
         id: revisions.id,
+        reportId: revisions.reportId,
         source: revisions.source,
         fileName: revisions.fileName,
         sha256: revisions.sha256,
@@ -332,5 +343,28 @@ export class ImportService {
       .from(revisions)
       .where(eq(revisions.reportId, reportId))
       .orderBy(desc(revisions.id));
+  }
+
+  async getAllImports(limit = 50, offset = 0) {
+    return this.db
+      .select({
+        id: revisions.id,
+        reportId: revisions.reportId,
+        reportDate: reports.date,
+        reportStatus: reports.status,
+        isCurrent: sql<boolean>`${reports.currentRevisionId} = ${revisions.id}`,
+        source: revisions.source,
+        fileName: revisions.fileName,
+        sha256: revisions.sha256,
+        stats: revisions.stats,
+        warnings: revisions.warnings,
+        createdAt: revisions.createdAt,
+        createdBy: revisions.createdBy,
+      })
+      .from(revisions)
+      .innerJoin(reports, eq(revisions.reportId, reports.id))
+      .orderBy(desc(revisions.createdAt))
+      .limit(limit)
+      .offset(offset);
   }
 }
