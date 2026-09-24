@@ -7,7 +7,10 @@
     ".": {
       "import": "./dist/index.js",
       "types": "./dist/index.d.ts"
-    }
+    },
+    "./tokens/tokens.css": "./src/tokens/tokens.css",
+    "./tokens/*": "./src/tokens/*",
+    "./*": "./src/*"
   },
   "scripts": {
     "build": "echo \"No build yet for ui\"",

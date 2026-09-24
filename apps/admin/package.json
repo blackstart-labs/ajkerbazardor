@@ -14,6 +14,7 @@
   },
   "dependencies": {
     "@ajkerbazardor/shared": "workspace:*",
+    "@ajkerbazardor/ui": "workspace:*",
     "@vueuse/core": "^13.2.0",
     "ofetch": "^1.4.1",
     "pinia": "^3.0.2",

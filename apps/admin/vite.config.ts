@@ -8,10 +8,11 @@ export default defineConfig({
   plugins: [vue()],
   server: { port: 3002 },
   resolve: {
-    alias: {
-      '@': fileURLToPath(new URL('./src', import.meta.url)),
-      '@ajkerbazardor/ui': uiRoot,
-    },
+    alias: [
+      { find: '@', replacement: fileURLToPath(new URL('./src', import.meta.url)) },
+      { find: /^@ajkerbazardor\/ui\/(.*)/, replacement: `${uiRoot}/$1` },
+      { find: '@ajkerbazardor/ui', replacement: uiRoot },
+    ],
   },
   optimizeDeps: {
     include: ['@ajkerbazardor/shared', 'vue-router', 'pinia', 'ofetch'],
