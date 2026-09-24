@@ -12,8 +12,8 @@
   "scripts": {
     "build": "tsc",
     "dev": "tsc --watch",
-    "test": "node --experimental-vm-modules node_modules/.bin/jest",
-    "test:coverage": "node --experimental-vm-modules node_modules/.bin/jest --coverage",
+    "test": "NODE_OPTIONS='--experimental-vm-modules' jest",
+    "test:coverage": "NODE_OPTIONS='--experimental-vm-modules' jest --coverage",
     "typecheck": "tsc --noEmit"
   },
   "devDependencies": {
