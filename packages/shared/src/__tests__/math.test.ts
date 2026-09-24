@@ -34,14 +34,12 @@ describe('changePct()', () => {
   it('computes correct positive change', () => {
     // soybean oil 5L: (1000−975)/975 × 100 = 2.564...%
     const result = changePct(1000, 975);
-    expect(result).not.toBeNull();
-    expect(result!).toBeCloseTo(2.564, 2);
+    expect(result).toBeCloseTo(2.564, 2);
   });
 
   it('computes correct negative change', () => {
     const result = changePct(90, 100);
-    expect(result).not.toBeNull();
-    expect(result!).toBeCloseTo(-10, 4);
+    expect(result).toBeCloseTo(-10, 4);
   });
 
   it('returns null when midNow is null', () => {
@@ -63,10 +61,9 @@ describe('changePct()', () => {
   it('computes green chilli change: mid(140,160)=150, mid(120,160)=140 → +7.14%', () => {
     // Sept 23 vs Sept 22: min went 120→140
     const prevMid = mid(120, 160); // 140
-    const nowMid = mid(140, 160);  // 150
+    const nowMid = mid(140, 160); // 150
     const pct = changePct(nowMid, prevMid);
-    expect(pct).not.toBeNull();
-    expect(pct!).toBeCloseTo(7.14, 1);
+    expect(pct).toBeCloseTo(7.14, 1);
   });
 });
 

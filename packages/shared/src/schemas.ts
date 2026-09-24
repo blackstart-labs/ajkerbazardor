@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import type { Direction, UserRole, ReportStatus, RevisionSource, Market, ImportWarningCode } from './types.js';
+import type { Direction, UserRole, ReportStatus, RevisionSource, ImportWarningCode } from './types.js';
 
 // ── Primitives ──────────────────────────────────────────────────────────────
 
