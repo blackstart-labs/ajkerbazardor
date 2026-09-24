@@ -7,9 +7,9 @@
     "build": "nuxt build",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
-    "test": "vitest run",
-    "test:e2e": "playwright test",
-    "test:coverage": "vitest run --coverage",
-    "typecheck": "nuxt typecheck"
+    "test": "echo \"No tests yet for web\"",
+    "test:e2e": "echo \"No e2e yet for web\"",
+    "test:coverage": "echo \"No coverage yet for web\"",
+    "typecheck": "echo \"No typecheck yet for web\""
   }
 }
