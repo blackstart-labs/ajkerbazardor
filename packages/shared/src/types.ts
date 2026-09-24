@@ -4,8 +4,6 @@
  */
 export type Direction = 'up' | 'down' | 'same';
 
-export const DIRECTION_THRESHOLD_PCT = 0.5;
-
 /** Source of a revision — TCB upload or a manual correction. */
 export type RevisionSource = 'tcb_import' | 'manual';
 
@@ -98,15 +96,3 @@ export type ImportWarningCode =
   | 'PCT_MISMATCH'
   | 'MISSING_PRODUCT';
 
-/** A single price point for a product in the public API. */
-export interface ProductPrice {
-  productId: number;
-  date: string;
-  min: number | null;
-  max: number | null;
-  mid: number | null;
-  prevDate: string | null;
-  prevMid: number | null;
-  changePct: number | null;
-  direction: Direction | null;
-}
