@@ -4,6 +4,7 @@ import { ThrottlerModule } from '@nestjs/throttler';
 import { envSchema } from './config/env.schema.js';
 import { DrizzleModule } from './drizzle/drizzle.module.js';
 import { AuthModule } from './auth/auth.module.js';
+import { ImporterModule } from './importer/importer.module.js';
 
 @Module({
   imports: [
@@ -27,6 +28,7 @@ import { AuthModule } from './auth/auth.module.js';
     ]),
     DrizzleModule,
     AuthModule,
+    ImporterModule,
   ],
 })
 export class AppModule {}

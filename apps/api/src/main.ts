@@ -3,6 +3,7 @@ import { NestFactory } from '@nestjs/core';
 import { FastifyAdapter, type NestFastifyApplication } from '@nestjs/platform-fastify';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import fastifyCookie from '@fastify/cookie';
+import fastifyMultipart from '@fastify/multipart';
 import { AppModule } from './app.module.js';
 import { AllExceptionsFilter } from './common/filters/all-exceptions.filter.js';
 import { ZodValidationPipe } from './common/pipes/zod-validation.pipe.js';
@@ -13,6 +14,13 @@ async function bootstrap() {
   // Register cookie plugin for fastify
   await app.register(fastifyCookie as unknown as Parameters<typeof app.register>[0], {
     secret: process.env['JWT_SECRET'] ?? 'cookie-secret-key-at-least-32-chars',
+  });
+
+  // Register multipart plugin for file uploads
+  await app.register(fastifyMultipart as unknown as Parameters<typeof app.register>[0], {
+    limits: {
+      fileSize: 10 * 1024 * 1024,
+    },
   });
 
   // CORS
