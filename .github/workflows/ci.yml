@@ -24,6 +24,9 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Build shared package
+        run: pnpm --filter @ajkerbazardor/shared build
+
       - name: Format Check
         run: pnpm format:check
 
@@ -50,6 +53,9 @@ jobs:
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
+
+      - name: Build shared package
+        run: pnpm --filter @ajkerbazardor/shared build
 
       - name: Run tests
         run: pnpm test
