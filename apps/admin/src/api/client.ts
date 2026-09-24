@@ -52,7 +52,7 @@ export async function apiGet<T>(path: string, query?: Record<string, unknown>): 
   return ofetch<T>(`${BASE}${path}`, options);
 }
 
-export async function apiPost<T>(path: string, body?: unknown): Promise<T> {
+export async function apiPost<T>(path: string, body?: FetchOptions<'json'>['body']): Promise<T> {
   const token = getAccessToken();
   return ofetch<T>(`${BASE}${path}`, {
     method: 'POST',
@@ -62,7 +62,7 @@ export async function apiPost<T>(path: string, body?: unknown): Promise<T> {
   });
 }
 
-export async function apiPatch<T>(path: string, body?: unknown): Promise<T> {
+export async function apiPatch<T>(path: string, body?: FetchOptions<'json'>['body']): Promise<T> {
   const token = getAccessToken();
   return ofetch<T>(`${BASE}${path}`, {
     method: 'PATCH',
@@ -72,7 +72,7 @@ export async function apiPatch<T>(path: string, body?: unknown): Promise<T> {
   });
 }
 
-export async function apiPut<T>(path: string, body?: unknown): Promise<T> {
+export async function apiPut<T>(path: string, body?: FetchOptions<'json'>['body']): Promise<T> {
   const token = getAccessToken();
   return ofetch<T>(`${BASE}${path}`, {
     method: 'PUT',
