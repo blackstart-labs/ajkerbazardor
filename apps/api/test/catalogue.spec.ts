@@ -6,41 +6,29 @@ import { ZodValidationPipe } from '../src/common/pipes/zod-validation.pipe.js';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import { eq } from 'drizzle-orm';
+import { createClient } from '@libsql/client';
+import { drizzle, type LibSQLDatabase } from 'drizzle-orm/libsql';
 import { AppModule } from '../src/app.module.js';
 import { AllExceptionsFilter } from '../src/common/filters/all-exceptions.filter.js';
 import { DRIZZLE } from '../src/drizzle/drizzle.module.js';
 import { AuthService } from '../src/auth/auth.service.js';
 import * as schema from '../src/drizzle/schema.js';
-import type { LibSQLDatabase } from 'drizzle-orm/libsql';
 
 describe('Catalogue, Corrections & Audit E2E', () => {
   let app: NestFastifyApplication;
+  let client: ReturnType<typeof createClient>;
   let db: LibSQLDatabase<typeof schema>;
   let adminToken: string;
-  const testDbPath = path.resolve(process.cwd(), `test-catalogue-${Date.now()}.db`);
+  const testDbPath = path.join(__dirname, `test-catalogue-${Date.now()}.db`);
 
   beforeAll(async () => {
-    process.env.TURSO_DATABASE_URL = `file:${testDbPath}`;
-    delete process.env.TURSO_AUTH_TOKEN;
+    client = createClient({ url: `file:${testDbPath}` });
+    db = drizzle(client, { schema });
 
-    const moduleFixture: TestingModule = await Test.createTestingModule({
-      imports: [AppModule],
-    }).compile();
-
-    app = moduleFixture.createNestApplication<NestFastifyApplication>(new FastifyAdapter());
-    app.setGlobalPrefix('api/v1');
-    app.useGlobalPipes(new ZodValidationPipe());
-    app.useGlobalFilters(new AllExceptionsFilter());
-    await app.init();
-    await app.getHttpAdapter().getInstance().ready();
-
-    db = moduleFixture.get(DRIZZLE);
-    const authService = moduleFixture.get(AuthService);
-
-    // Apply migrations
-    const migrations = ['drizzle/migrations/0001_initial.sql', 'drizzle/migrations/0002_seed.sql'];
-    for (const m of migrations) {
-      const content = fs.readFileSync(path.resolve(process.cwd(), m), 'utf8');
+    // Apply migrations before initializing app
+    const migrationsDir = path.join(__dirname, '../drizzle/migrations');
+    for (const file of ['0001_initial.sql', '0002_seed.sql']) {
+      const content = fs.readFileSync(path.join(migrationsDir, file), 'utf8');
       const stripped = content
         .split('\n')
         .map((l) => {
@@ -53,16 +41,32 @@ describe('Catalogue, Corrections & Audit E2E', () => {
         .map((s) => s.trim())
         .filter((s) => s.length > 0);
       for (const stmt of stmts) {
-        await db.run(stmt);
+        await client.execute(stmt);
       }
     }
 
+    const moduleFixture: TestingModule = await Test.createTestingModule({
+      imports: [AppModule],
+    })
+      .overrideProvider(DRIZZLE)
+      .useValue(db)
+      .compile();
+
+    app = moduleFixture.createNestApplication<NestFastifyApplication>(new FastifyAdapter());
+    app.setGlobalPrefix('api/v1');
+    app.useGlobalPipes(new ZodValidationPipe());
+    app.useGlobalFilters(new AllExceptionsFilter());
+    await app.init();
+    await app.getHttpAdapter().getInstance().ready();
+
+    const authService = moduleFixture.get(AuthService);
+
     // Clean dynamic tables for isolated test runs
-    await db.run('DELETE FROM price_entry');
-    await db.run('DELETE FROM revision');
-    await db.run('DELETE FROM report');
-    await db.run('DELETE FROM product');
-    await db.run('DELETE FROM audit_log');
+    await client.execute('DELETE FROM price_entry');
+    await client.execute('DELETE FROM revision');
+    await client.execute('DELETE FROM report');
+    await client.execute('DELETE FROM product');
+    await client.execute('DELETE FROM audit_log');
 
     // Seed admin & get token
     await authService.seedAdminIfEmpty();
@@ -75,7 +79,10 @@ describe('Catalogue, Corrections & Audit E2E', () => {
   });
 
   afterAll(async () => {
-    await app.close();
+    if (app) {
+      await app.close();
+    }
+    client?.close();
     if (fs.existsSync(testDbPath)) {
       fs.unlinkSync(testDbPath);
     }

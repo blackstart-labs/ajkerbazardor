@@ -27,21 +27,27 @@ export class AuthService implements OnApplicationBootstrap {
   }
 
   async seedAdminIfEmpty(): Promise<void> {
-    const countResult = await this.db.select({ count: sql<number>`count(*)` }).from(users);
-    const count = Number(countResult[0]?.count ?? 0);
+    try {
+      const countResult = await this.db.select({ count: sql<number>`count(*)` }).from(users);
+      const count = Number(countResult[0]?.count ?? 0);
 
-    if (count === 0) {
-      const email = this.configService.get('ADMIN_EMAIL');
-      const password = this.configService.get('ADMIN_PASSWORD');
-      const passwordHash = await argon2.hash(password);
+      if (count === 0) {
+        const email = this.configService.get('ADMIN_EMAIL');
+        const password = this.configService.get('ADMIN_PASSWORD');
+        const passwordHash = await argon2.hash(password);
 
-      await this.db.insert(users).values({
-        email,
-        passwordHash,
-        role: 'admin',
-      });
+        await this.db.insert(users).values({
+          email,
+          passwordHash,
+          role: 'admin',
+        });
 
-      this.logger.warn(`Seeded initial admin user: ${email}`);
+        this.logger.warn(`Seeded initial admin user: ${email}`);
+      }
+    } catch (err) {
+      this.logger.warn(
+        `Could not seed initial admin user (migrations may not have run): ${err instanceof Error ? err.message : String(err)}`,
+      );
     }
   }
 
