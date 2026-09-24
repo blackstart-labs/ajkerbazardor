@@ -219,6 +219,9 @@ importers:
       '@ajkerbazardor/shared':
         specifier: workspace:*
         version: link:../../packages/shared
+      '@ajkerbazardor/ui':
+        specifier: workspace:*
+        version: link:../../packages/ui
       '@vueuse/core':
         specifier: ^13.2.0
         version: 13.9.0(vue@3.5.43(typescript@5.9.3))
