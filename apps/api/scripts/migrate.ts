@@ -13,6 +13,14 @@ const path = require('node:path');
 
 const MIGRATIONS_DIR = path.join(__dirname, '..', 'drizzle', 'migrations');
 
+if (typeof process.loadEnvFile === 'function') {
+  try {
+    process.loadEnvFile(path.join(__dirname, '..', '.env'));
+  } catch {
+    // Ignore if .env doesn't exist
+  }
+}
+
 async function migrate(): Promise<void> {
   const url = process.env['TURSO_DATABASE_URL'];
   if (!url) throw new Error('TURSO_DATABASE_URL is required');

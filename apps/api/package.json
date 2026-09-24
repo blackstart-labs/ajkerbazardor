@@ -16,6 +16,7 @@
   },
   "dependencies": {
     "@ajkerbazardor/shared": "workspace:*",
+    "@fastify/static": "^10.1.4",
     "@libsql/client": "^0.18.0",
     "@nestjs/common": "^11.2.6",
     "@nestjs/config": "^4.0.4",
