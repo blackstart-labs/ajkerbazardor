@@ -1,19 +1,26 @@
 <script setup lang="ts">
-export interface Column<T = Record<string, unknown>> {
+export interface Column {
   key: string;
   label: string;
-  align?: 'left' | 'center' | 'right';
-  width?: string;
-  formatter?: (row: T) => string | number;
+  align?: 'left' | 'center' | 'right' | undefined;
+  width?: string | undefined;
+  formatter?: ((row: unknown) => string | number) | undefined;
 }
 
-export interface DataGridProps<T = Record<string, unknown>> {
-  columns: Column<T>[];
-  data: T[];
-  caption?: string;
+export interface DataGridProps {
+  columns: Column[];
+  data: unknown[];
+  caption?: string | undefined;
 }
 
 defineProps<DataGridProps>();
+
+function getVal(row: unknown, key: string): unknown {
+  if (typeof row === 'object' && row !== null) {
+    return (row as Record<string, unknown>)[key];
+  }
+  return undefined;
+}
 </script>
 
 <template>
@@ -39,8 +46,8 @@ defineProps<DataGridProps>();
       <tbody>
         <tr v-for="(row, idx) in data" :key="idx">
           <td v-for="col in columns" :key="col.key" :style="{ textAlign: col.align || 'left' }">
-            <slot :name="col.key" :row="row" :value="row[col.key]">
-              {{ col.formatter ? col.formatter(row) : row[col.key] }}
+            <slot :name="col.key" :row="row" :value="getVal(row, col.key)">
+              {{ col.formatter ? col.formatter(row) : getVal(row, col.key) }}
             </slot>
           </td>
         </tr>
