@@ -1,0 +1,50 @@
+# Dependencies
+node_modules/
+.pnpm-store/
+
+# Build outputs
+dist/
+.output/
+.nuxt/
+.cache/
+build/
+
+# Database
+*.db
+*.db-shm
+*.db-wal
+drizzle/
+
+# Environment
+.env
+.env.local
+.env.*.local
+!.env.example
+
+# Test artifacts
+coverage/
+playwright-report/
+test-results/
+
+# Raw (unoptimised) assets — optimised ones go in assets/optimised/
+assets/raw/
+
+# Editor / OS
+.idea/
+.vscode/settings.json
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# pnpm
+.pnpm-debug.log
+
+# Lighthouse CI
+.lighthouseci/
+
+reference
