@@ -11,7 +11,7 @@
     "test:coverage": "pnpm --recursive run test:coverage",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
-    "typecheck": "pnpm --recursive run typecheck",
+    "typecheck": "pnpm --filter @ajkerbazardor/shared build && pnpm --recursive run typecheck",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "migrate": "pnpm --filter api run migrate",

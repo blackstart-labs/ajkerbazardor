@@ -3,6 +3,10 @@ import { ConfigModule } from '@nestjs/config';
 import { ThrottlerModule } from '@nestjs/throttler';
 import { envSchema } from './config/env.schema.js';
 import { DrizzleModule } from './drizzle/drizzle.module.js';
+import { AuthModule } from './auth/auth.module.js';
+import { ImporterModule } from './importer/importer.module.js';
+import { AuditModule } from './audit/audit.module.js';
+import { CatalogueModule } from './catalogue/catalogue.module.js';
 
 @Module({
   imports: [
@@ -25,6 +29,10 @@ import { DrizzleModule } from './drizzle/drizzle.module.js';
       },
     ]),
     DrizzleModule,
+    AuditModule,
+    AuthModule,
+    ImporterModule,
+    CatalogueModule,
   ],
 })
 export class AppModule {}
