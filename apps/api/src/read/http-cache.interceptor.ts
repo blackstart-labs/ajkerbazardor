@@ -1,14 +1,14 @@
-import { Injectable, type NestInterceptor, type ExecutionContext, type CallHandler } from '@nestjs/common';
+import { Injectable, Inject, type NestInterceptor, type ExecutionContext, type CallHandler } from '@nestjs/common';
 import type { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import type { FastifyReply, FastifyRequest } from 'fastify';
 import * as crypto from 'node:crypto';
-// eslint-disable-next-line @typescript-eslint/consistent-type-imports
+
 import { CachePurgerService } from './cache-purger.service.js';
 
 @Injectable()
 export class HttpCacheInterceptor implements NestInterceptor {
-  constructor(private readonly purger: CachePurgerService) {}
+  constructor(@Inject(CachePurgerService) private readonly purger: CachePurgerService) {}
 
   intercept(context: ExecutionContext, next: CallHandler): Observable<unknown> {
     const http = context.switchToHttp();

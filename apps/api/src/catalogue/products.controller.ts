@@ -3,6 +3,7 @@ import {
   Get,
   Post,
   Put,
+  Patch,
   Delete,
   Param,
   Body,
@@ -11,9 +12,10 @@ import {
   ParseIntPipe,
   HttpCode,
   HttpStatus,
+  Inject,
 } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiBearerAuth, ApiQuery, ApiResponse } from '@nestjs/swagger';
-// eslint-disable-next-line @typescript-eslint/consistent-type-imports
+
 import { ProductsService } from './products.service.js';
 import type { CreateProductDto, UpdateProductDto, ApproveProductDto } from './products.service.js';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard.js';
@@ -22,16 +24,17 @@ import { Roles } from '../auth/decorators/roles.decorator.js';
 import { CurrentUser } from '../auth/decorators/current-user.decorator.js';
 
 @ApiTags('Admin / Products')
-@Controller('admin')
+@Controller()
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Roles('admin', 'editor')
 @ApiBearerAuth()
 export class ProductsController {
-  constructor(private readonly productsService: ProductsService) {}
+  constructor(@Inject(ProductsService) private readonly productsService: ProductsService) {}
 
-  @Get('products')
+  @Get(['admin/products', 'catalogue/products'])
   @ApiOperation({ summary: 'List products for admin with filters and pagination' })
   @ApiQuery({ name: 'search', required: false, type: String })
+  @ApiQuery({ name: 'q', required: false, type: String })
   @ApiQuery({ name: 'categoryId', required: false, type: Number })
   @ApiQuery({ name: 'needsReview', required: false, type: Boolean })
   @ApiQuery({ name: 'includeArchived', required: false, type: Boolean })
@@ -40,6 +43,7 @@ export class ProductsController {
   @ApiResponse({ status: 200, description: 'List of products' })
   async getProducts(
     @Query('search') search?: string,
+    @Query('q') q?: string,
     @Query('categoryId') categoryId?: string,
     @Query('needsReview') needsReview?: string,
     @Query('includeArchived') includeArchived?: string,
@@ -47,7 +51,7 @@ export class ProductsController {
     @Query('offset') offset?: string,
   ) {
     const data = await this.productsService.findAdmin({
-      search,
+      search: search ?? q,
       categoryId: categoryId ? parseInt(categoryId, 10) : undefined,
       needsReview: needsReview !== undefined ? needsReview === 'true' || needsReview === '1' : undefined,
       includeArchived: includeArchived === 'true' || includeArchived === '1',
@@ -57,7 +61,7 @@ export class ProductsController {
     return { ok: true, data };
   }
 
-  @Get('review-queue')
+  @Get(['admin/review-queue', 'catalogue/review-queue'])
   @ApiOperation({ summary: 'List products that require admin review' })
   @ApiQuery({ name: 'limit', required: false, type: Number })
   @ApiQuery({ name: 'offset', required: false, type: Number })
@@ -70,7 +74,7 @@ export class ProductsController {
     return { ok: true, data };
   }
 
-  @Put('review-queue/:id/approve')
+  @Put(['admin/review-queue/:id/approve', 'catalogue/review-queue/:id/approve'])
   @ApiOperation({ summary: 'Approve an auto-created product from the review queue' })
   @ApiResponse({ status: 200, description: 'Product approved' })
   async approveProduct(
@@ -82,7 +86,7 @@ export class ProductsController {
     return { ok: true, data };
   }
 
-  @Get('products/:id')
+  @Get(['admin/products/:id', 'catalogue/products/:id'])
   @ApiOperation({ summary: 'Get product by ID' })
   @ApiResponse({ status: 200, description: 'Product details' })
   @ApiResponse({ status: 404, description: 'Product not found' })
@@ -91,7 +95,7 @@ export class ProductsController {
     return { ok: true, data };
   }
 
-  @Post('products')
+  @Post(['admin/products', 'catalogue/products'])
   @ApiOperation({ summary: 'Create a new product manually' })
   @ApiResponse({ status: 201, description: 'Product created' })
   @ApiResponse({ status: 400, description: 'Duplicate or invalid data' })
@@ -100,7 +104,8 @@ export class ProductsController {
     return { ok: true, data };
   }
 
-  @Put('products/:id')
+  @Put(['admin/products/:id', 'catalogue/products/:id'])
+  @Patch(['admin/products/:id', 'catalogue/products/:id'])
   @ApiOperation({ summary: 'Update an existing product' })
   @ApiResponse({ status: 200, description: 'Product updated' })
   @ApiResponse({ status: 404, description: 'Product not found' })
@@ -113,7 +118,7 @@ export class ProductsController {
     return { ok: true, data };
   }
 
-  @Put('products/:id/archive')
+  @Put(['admin/products/:id/archive', 'catalogue/products/:id/archive'])
   @ApiOperation({ summary: 'Soft-archive a product' })
   @ApiResponse({ status: 200, description: 'Product archived' })
   async archiveProduct(@Param('id', ParseIntPipe) id: number, @CurrentUser() user: { id: number }) {
@@ -121,7 +126,7 @@ export class ProductsController {
     return { ok: true, data };
   }
 
-  @Put('products/:id/unarchive')
+  @Put(['admin/products/:id/unarchive', 'catalogue/products/:id/unarchive'])
   @ApiOperation({ summary: 'Restore an archived product' })
   @ApiResponse({ status: 200, description: 'Product unarchived' })
   async unarchiveProduct(@Param('id', ParseIntPipe) id: number, @CurrentUser() user: { id: number }) {
@@ -129,7 +134,7 @@ export class ProductsController {
     return { ok: true, data };
   }
 
-  @Delete('products/:id')
+  @Delete(['admin/products/:id', 'catalogue/products/:id'])
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Hard delete a product (only allowed if no price history exists)' })
   @ApiResponse({ status: 200, description: 'Product deleted' })

@@ -1,7 +1,7 @@
 import { Injectable, Inject, UnauthorizedException } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
-// eslint-disable-next-line @typescript-eslint/consistent-type-imports
+
 import { ConfigService } from '@nestjs/config';
 import type { LibSQLDatabase } from 'drizzle-orm/libsql';
 import { eq } from 'drizzle-orm';
@@ -19,7 +19,7 @@ export interface JwtPayload {
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
   constructor(
-    configService: ConfigService<Env, true>,
+    @Inject(ConfigService) configService: ConfigService<Env, true>,
     @Inject(DRIZZLE) private readonly db: LibSQLDatabase<typeof schema>,
   ) {
     super({

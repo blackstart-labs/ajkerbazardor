@@ -1,20 +1,20 @@
-import { Controller, Get, Query, UseGuards } from '@nestjs/common';
+import { Controller, Get, Query, UseGuards, Inject } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiBearerAuth, ApiQuery, ApiResponse } from '@nestjs/swagger';
-// eslint-disable-next-line @typescript-eslint/consistent-type-imports
+
 import { AuditService } from './audit.service.js';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard.js';
 import { RolesGuard } from '../auth/guards/roles.guard.js';
 import { Roles } from '../auth/decorators/roles.decorator.js';
 
 @ApiTags('Admin / Audit')
-@Controller('admin/audit')
+@Controller()
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Roles('admin')
 @ApiBearerAuth()
 export class AuditController {
-  constructor(private readonly auditService: AuditService) {}
+  constructor(@Inject(AuditService) private readonly auditService: AuditService) {}
 
-  @Get()
+  @Get(['admin/audit', 'catalogue/audit-log'])
   @ApiOperation({ summary: 'List recent audit logs (Admin only)' })
   @ApiQuery({ name: 'limit', required: false, type: Number, description: 'Max records (default 50)' })
   @ApiQuery({ name: 'offset', required: false, type: Number, description: 'Offset records (default 0)' })

@@ -3,7 +3,7 @@ import { eq, asc, count } from 'drizzle-orm';
 import type { LibSQLDatabase } from 'drizzle-orm/libsql';
 import { DRIZZLE } from '../drizzle/drizzle.module.js';
 import * as schema from '../drizzle/schema.js';
-// eslint-disable-next-line @typescript-eslint/consistent-type-imports
+
 import { AuditService } from '../audit/audit.service.js';
 
 export interface CreateCategoryDto {
@@ -24,7 +24,7 @@ export interface UpdateCategoryDto {
 export class CategoriesService {
   constructor(
     @Inject(DRIZZLE) private readonly db: LibSQLDatabase<typeof schema>,
-    private readonly auditService: AuditService,
+    @Inject(AuditService) private readonly auditService: AuditService,
   ) {}
 
   async findAll() {

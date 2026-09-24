@@ -1,7 +1,7 @@
 import { Injectable, Inject, UnauthorizedException, Logger, type OnApplicationBootstrap } from '@nestjs/common';
-// eslint-disable-next-line @typescript-eslint/consistent-type-imports
+
 import { JwtService } from '@nestjs/jwt';
-// eslint-disable-next-line @typescript-eslint/consistent-type-imports
+
 import { ConfigService } from '@nestjs/config';
 import type { LibSQLDatabase } from 'drizzle-orm/libsql';
 import * as argon2 from 'argon2';
@@ -18,8 +18,8 @@ export class AuthService implements OnApplicationBootstrap {
 
   constructor(
     @Inject(DRIZZLE) private readonly db: LibSQLDatabase<typeof schema>,
-    private readonly jwtService: JwtService,
-    private readonly configService: ConfigService<Env, true>,
+    @Inject(JwtService) private readonly jwtService: JwtService,
+    @Inject(ConfigService) private readonly configService: ConfigService<Env, true>,
   ) {}
 
   async onApplicationBootstrap() {

@@ -31,7 +31,9 @@ async function bootstrap() {
   });
 
   // Global prefix for all routes
-  app.setGlobalPrefix('api/v1');
+  app.setGlobalPrefix('api/v1', {
+    exclude: ['health', 'api/v1/health'],
+  });
 
   // Global validation pipe (zod-based)
   app.useGlobalPipes(new ZodValidationPipe());

@@ -10,10 +10,11 @@ import {
   ParseIntPipe,
   HttpCode,
   HttpStatus,
+  Inject,
 } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiBearerAuth, ApiResponse } from '@nestjs/swagger';
 import type { CreateGroupMapDto, UpdateGroupMapDto } from './group-map.service.js';
-// eslint-disable-next-line @typescript-eslint/consistent-type-imports
+
 import { GroupMapService } from './group-map.service.js';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard.js';
 import { RolesGuard } from '../auth/guards/roles.guard.js';
@@ -26,7 +27,7 @@ import { CurrentUser } from '../auth/decorators/current-user.decorator.js';
 @Roles('admin', 'editor')
 @ApiBearerAuth()
 export class GroupMapController {
-  constructor(private readonly groupMapService: GroupMapService) {}
+  constructor(@Inject(GroupMapService) private readonly groupMapService: GroupMapService) {}
 
   @Get()
   @ApiOperation({ summary: 'List all TCB group-to-category mappings' })

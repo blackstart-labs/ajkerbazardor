@@ -1,6 +1,6 @@
-import { Controller, Get, Param, UseInterceptors } from '@nestjs/common';
+import { Controller, Get, Param, UseInterceptors, Inject } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiParam } from '@nestjs/swagger';
-// eslint-disable-next-line @typescript-eslint/consistent-type-imports
+
 import { ReportsReadService } from './reports-read.service.js';
 import { HttpCacheInterceptor } from './http-cache.interceptor.js';
 
@@ -8,7 +8,7 @@ import { HttpCacheInterceptor } from './http-cache.interceptor.js';
 @Controller('reports')
 @UseInterceptors(HttpCacheInterceptor)
 export class ReportsReadController {
-  constructor(private readonly reportsService: ReportsReadService) {}
+  constructor(@Inject(ReportsReadService) private readonly reportsService: ReportsReadService) {}
 
   @Get('latest')
   @ApiOperation({ summary: 'Get latest published report with summary stats' })

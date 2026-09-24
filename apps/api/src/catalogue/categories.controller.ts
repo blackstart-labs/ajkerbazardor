@@ -10,10 +10,11 @@ import {
   ParseIntPipe,
   HttpCode,
   HttpStatus,
+  Inject,
 } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiBearerAuth, ApiResponse } from '@nestjs/swagger';
 import type { CreateCategoryDto, UpdateCategoryDto } from './categories.service.js';
-// eslint-disable-next-line @typescript-eslint/consistent-type-imports
+
 import { CategoriesService } from './categories.service.js';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard.js';
 import { RolesGuard } from '../auth/guards/roles.guard.js';
@@ -23,7 +24,7 @@ import { CurrentUser } from '../auth/decorators/current-user.decorator.js';
 @ApiTags('Categories')
 @Controller('categories')
 export class CategoriesController {
-  constructor(private readonly categoriesService: CategoriesService) {}
+  constructor(@Inject(CategoriesService) private readonly categoriesService: CategoriesService) {}
 
   @Get()
   @ApiOperation({ summary: 'List all categories ordered by sortOrder' })

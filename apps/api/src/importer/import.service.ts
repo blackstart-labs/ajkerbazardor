@@ -14,9 +14,9 @@ import {
   groupMaps,
   auditLogs,
 } from '../drizzle/schema.js';
-// eslint-disable-next-line @typescript-eslint/consistent-type-imports
+
 import { TcbParserService } from './tcb-parser.service.js';
-// eslint-disable-next-line @typescript-eslint/consistent-type-imports
+
 import { CachePurgerService } from '../read/cache-purger.service.js';
 
 export interface ImportResult {
@@ -37,8 +37,8 @@ export class ImportService {
 
   constructor(
     @Inject(DRIZZLE) private readonly db: LibSQLDatabase<typeof schema>,
-    private readonly parser: TcbParserService,
-    @Optional() private readonly purger?: CachePurgerService,
+    @Inject(TcbParserService) private readonly parser: TcbParserService,
+    @Optional() @Inject(CachePurgerService) private readonly purger?: CachePurgerService,
   ) {}
 
   async importTcbFile(buffer: Buffer, fileName: string, userId: number): Promise<ImportResult> {

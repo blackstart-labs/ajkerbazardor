@@ -4,12 +4,23 @@
   "private": true,
   "scripts": {
     "dev": "nuxt dev",
-    "build": "echo \"No build yet for web\"",
+    "build": "nuxt build",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
     "test": "echo \"No tests yet for web\"",
     "test:e2e": "echo \"No e2e yet for web\"",
     "test:coverage": "echo \"No coverage yet for web\"",
-    "typecheck": "echo \"No typecheck yet for web\""
+    "typecheck": "nuxt typecheck"
+  },
+  "dependencies": {
+    "@ajkerbazardor/shared": "workspace:*",
+    "@ajkerbazardor/ui": "workspace:*",
+    "@pinia/nuxt": "^0.11.1",
+    "@vueuse/core": "^13.2.0",
+    "@vueuse/nuxt": "^13.2.0",
+    "nuxt": "^3.17.5",
+    "ofetch": "^1.4.1",
+    "pinia": "^3.0.2",
+    "vue": "^3.5.16"
   }
 }
