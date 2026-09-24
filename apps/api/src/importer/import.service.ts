@@ -1,4 +1,4 @@
-import { Injectable, Inject, BadRequestException, Logger } from '@nestjs/common';
+import { Injectable, Inject, BadRequestException, Logger, Optional } from '@nestjs/common';
 import * as crypto from 'node:crypto';
 import { eq, and, sql, desc, lt } from 'drizzle-orm';
 import type { LibSQLDatabase } from 'drizzle-orm/libsql';
@@ -16,6 +16,8 @@ import {
 } from '../drizzle/schema.js';
 // eslint-disable-next-line @typescript-eslint/consistent-type-imports
 import { TcbParserService } from './tcb-parser.service.js';
+// eslint-disable-next-line @typescript-eslint/consistent-type-imports
+import { CachePurgerService } from '../read/cache-purger.service.js';
 
 export interface ImportResult {
   reportId: number;
@@ -36,6 +38,7 @@ export class ImportService {
   constructor(
     @Inject(DRIZZLE) private readonly db: LibSQLDatabase<typeof schema>,
     private readonly parser: TcbParserService,
+    @Optional() private readonly purger?: CachePurgerService,
   ) {}
 
   async importTcbFile(buffer: Buffer, fileName: string, userId: number): Promise<ImportResult> {
@@ -268,6 +271,8 @@ export class ImportService {
       `Successfully imported TCB bulletin for ${parsed.date} (rev ${revisionId}, ${parsed.products.length} products)`,
     );
 
+    this.purger?.purge();
+
     return {
       reportId,
       revisionId,
@@ -313,6 +318,8 @@ export class ImportService {
       entityId: reportId,
       diff: JSON.stringify({ fromRevisionId: report.currentRevisionId, toRevisionId: prevRev.id }),
     });
+
+    this.purger?.purge();
 
     return { previousRevisionId: prevRev.id };
   }

@@ -1,10 +1,12 @@
-import { Injectable, Inject, BadRequestException } from '@nestjs/common';
+import { Injectable, Inject, BadRequestException, Optional } from '@nestjs/common';
 import { eq } from 'drizzle-orm';
 import type { LibSQLDatabase } from 'drizzle-orm/libsql';
 import { DRIZZLE } from '../drizzle/drizzle.module.js';
 import * as schema from '../drizzle/schema.js';
 // eslint-disable-next-line @typescript-eslint/consistent-type-imports
 import { AuditService } from '../audit/audit.service.js';
+// eslint-disable-next-line @typescript-eslint/consistent-type-imports
+import { CachePurgerService } from '../read/cache-purger.service.js';
 
 export interface CorrectionEntryDto {
   productId: number;
@@ -28,6 +30,7 @@ export class CorrectionsService {
   constructor(
     @Inject(DRIZZLE) private readonly db: LibSQLDatabase<typeof schema>,
     private readonly auditService: AuditService,
+    @Optional() private readonly purger?: CachePurgerService,
   ) {}
 
   async applyCorrections(date: string, dto: SaveCorrectionsDto, userId: number) {
@@ -163,6 +166,8 @@ export class CorrectionsService {
         entriesCount: dto.entries.length,
       },
     });
+
+    this.purger?.purge();
 
     return {
       success: true,
