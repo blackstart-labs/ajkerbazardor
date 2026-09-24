@@ -34,8 +34,7 @@ export const copy = {
   watchlistAdd: 'Watchlist-এ রাখুন',
   watchlistRemove: 'Watchlist থেকে সরান',
   listTitle: 'বাজারের ফর্দ',
-  listEstimate: (today: string, lastWeek: string) =>
-    `আজকের হিসাবে আনুমানিক খরচ ${today}; গত সপ্তাহে লাগত ${lastWeek}`,
+  listEstimate: (today: string, lastWeek: string) => `আজকের হিসাবে আনুমানিক খরচ ${today}; গত সপ্তাহে লাগত ${lastWeek}`,
 
   // ── Search results ────────────────────────────────────────────────────────
   searchEmpty: 'এই নামে কিছু খুঁজে পেলাম না। অন্য কিছু লিখে দেখুন তো?',
@@ -60,8 +59,7 @@ export const copy = {
   // ── About page ────────────────────────────────────────────────────────────
   aboutTitle: 'Method ও Source',
   aboutTCBNote: 'এটা TCB-র অফিসিয়াল সাইট না — ডেটা TCB-র প্রতিদিনের বুলেটিন থেকে নেওয়া।',
-  aboutIndexDisclaimer:
-    'Bazar Index একটি সরল গড়, কোনো সরকারি মূল্যস্ফীতির সংখ্যা না।',
+  aboutIndexDisclaimer: 'Bazar Index একটি সরল গড়, কোনো সরকারি মূল্যস্ফীতির সংখ্যা না।',
 
   // ── Direction labels (used in badges and copy) ────────────────────────────
   directionUp: 'বেড়েছে',

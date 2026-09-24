@@ -2,6 +2,8 @@
   "name": "ajkerbazardor",
   "private": true,
   "version": "1.0.0",
+  "type": "module",
+  "packageManager": "pnpm@12.6.0",
   "scripts": {
     "dev": "pnpm --parallel run dev",
     "build": "pnpm --recursive run build",
@@ -26,7 +28,8 @@
     "husky": "^9.1.7",
     "lint-staged": "^15.2.11",
     "prettier": "^3.4.2",
-    "typescript": "^5.7.2"
+    "typescript": "^5.7.2",
+    "vue-eslint-parser": "^10.4.1"
   },
   "engines": {
     "node": ">=22.0.0",

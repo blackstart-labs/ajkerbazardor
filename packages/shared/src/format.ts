@@ -24,9 +24,8 @@ const compactNumberFormatter = new Intl.NumberFormat(BN_BD, {
   maximumFractionDigits: 1,
 });
 
-const percentFormatter = new Intl.NumberFormat(BN_BD, {
+const decimalFormatter = new Intl.NumberFormat(BN_BD, {
   ...BENG_SYSTEM,
-  style: 'percent',
   minimumFractionDigits: 1,
   maximumFractionDigits: 1,
 });
@@ -64,12 +63,7 @@ export function formatPriceRange(min: number | null, max: number | null): string
 export function formatChangePct(pct: number | null): string {
   if (pct === null) return '—';
   const sign = pct > 0 ? '+' : '';
-  // percentFormatter expects a fraction (0.042), but pct is already 4.2
-  const formatted = new Intl.NumberFormat(BN_BD, {
-    ...BENG_SYSTEM,
-    minimumFractionDigits: 1,
-    maximumFractionDigits: 1,
-  }).format(Math.abs(pct));
+  const formatted = decimalFormatter.format(Math.abs(pct));
   return `${sign === '+' ? '+' : '−'}${formatted}%`;
 }
 
@@ -163,9 +157,7 @@ export function formatLastUpdated(isoTimestamp: string): string {
  * "গত সপ্তাহ" / "গত মাস" / "গত বছর" / "২০ সেপ্টেম্বর".
  */
 export function formatRelativePeriod(prevDate: string, currentDate: string): string {
-  const diffDays = Math.round(
-    (new Date(currentDate).getTime() - new Date(prevDate).getTime()) / (1000 * 60 * 60 * 24),
-  );
+  const diffDays = Math.round((new Date(currentDate).getTime() - new Date(prevDate).getTime()) / (1000 * 60 * 60 * 24));
   if (diffDays <= 8) return 'গত সপ্তাহ';
   if (diffDays <= 35) return 'গত মাস';
   if (diffDays >= 340) return 'গত বছর';

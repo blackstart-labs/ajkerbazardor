@@ -90,9 +90,4 @@ export interface ImportWarning {
 }
 
 export type ImportWarningCode =
-  | 'LOW_PRODUCT_COUNT'
-  | 'MIN_EXCEEDS_MAX'
-  | 'LARGE_CHANGE'
-  | 'PCT_MISMATCH'
-  | 'MISSING_PRODUCT';
-
+  'LOW_PRODUCT_COUNT' | 'MIN_EXCEEDS_MAX' | 'LARGE_CHANGE' | 'PCT_MISMATCH' | 'MISSING_PRODUCT';

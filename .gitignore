@@ -9,11 +9,15 @@ dist/
 .cache/
 build/
 
+# Turbo
+.turbo/
+
 # Database
 *.db
 *.db-shm
 *.db-wal
-drizzle/
+!apps/api/drizzle/migrations/
+
 
 # Environment
 .env

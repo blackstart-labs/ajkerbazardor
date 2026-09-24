@@ -69,16 +69,16 @@ pnpm dev
 All required vars are documented in [`apps/api/.env.example`](apps/api/.env.example).
 Required at boot — the API refuses to start if any are missing.
 
-| Variable | Description |
-|---|---|
-| `TURSO_DATABASE_URL` | `libsql://…turso.io` for remote, `file:./dev.db` for local |
-| `TURSO_AUTH_TOKEN` | Turso auth token (empty string for local file) |
-| `JWT_SECRET` | ≥32-character random string |
-| `ADMIN_EMAIL` | Seeded admin account email |
-| `ADMIN_PASSWORD` | Seeded admin account password |
-| `STORAGE_DRIVER` | `local` (dev) or `s3` (production) |
-| `S3_BUCKET` / `S3_ENDPOINT` / `S3_ACCESS_KEY` / `S3_SECRET_KEY` | Required when `STORAGE_DRIVER=s3` |
-| `CORS_ORIGIN` | Comma-separated allowed origins |
+| Variable                                                        | Description                                                |
+| --------------------------------------------------------------- | ---------------------------------------------------------- |
+| `TURSO_DATABASE_URL`                                            | `libsql://…turso.io` for remote, `file:./dev.db` for local |
+| `TURSO_AUTH_TOKEN`                                              | Turso auth token (empty string for local file)             |
+| `JWT_SECRET`                                                    | ≥32-character random string                                |
+| `ADMIN_EMAIL`                                                   | Seeded admin account email                                 |
+| `ADMIN_PASSWORD`                                                | Seeded admin account password                              |
+| `STORAGE_DRIVER`                                                | `local` (dev) or `s3` (production)                         |
+| `S3_BUCKET` / `S3_ENDPOINT` / `S3_ACCESS_KEY` / `S3_SECRET_KEY` | Required when `STORAGE_DRIVER=s3`                          |
+| `CORS_ORIGIN`                                                   | Comma-separated allowed origins                            |
 
 ---
 
@@ -143,10 +143,10 @@ Store the SQL dump somewhere outside Turso (e.g. an S3 bucket or git-ignored loc
 
 The project is hosting-agnostic. Dockerfiles are in each app directory.
 
-| App | Container | Notes |
-|---|---|---|
-| `api` | `apps/api/Dockerfile` | Node 22, listens on `PORT` (default 3000) |
-| `web` | `apps/web/Dockerfile` | Nuxt 3 Node server, SSR |
+| App     | Container               | Notes                                     |
+| ------- | ----------------------- | ----------------------------------------- |
+| `api`   | `apps/api/Dockerfile`   | Node 22, listens on `PORT` (default 3000) |
+| `web`   | `apps/web/Dockerfile`   | Nuxt 3 Node server, SSR                   |
 | `admin` | `apps/admin/Dockerfile` | Static build, serve with nginx or any CDN |
 
 **Database in production:** a separate Turso database per environment (staging, production). Set `TURSO_DATABASE_URL` and `TURSO_AUTH_TOKEN` from your Turso dashboard.
