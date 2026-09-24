@@ -1,0 +1,7 @@
+# pnpm workspace settings (pnpm v10+)
+# See: https://pnpm.io/settings
+onlyBuiltDependencies:
+  - esbuild
+  - vue-demi
+  - sharp
+  - '@parcel/watcher'
