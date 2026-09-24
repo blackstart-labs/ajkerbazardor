@@ -1,0 +1,43 @@
+- name: 'app:api'
+  color: '0052cc'
+  description: 'NestJS backend API and Turso database'
+
+- name: 'app:web'
+  color: '00dc82'
+  description: 'Nuxt 3 SSR public storefront and dashboard'
+
+- name: 'app:admin'
+  color: '41b883'
+  description: 'Vue 3 admin SPA'
+
+- name: 'pkg:shared'
+  color: 'f1e05a'
+  description: 'Shared Zod schemas, types, formatters, and math'
+
+- name: 'pkg:ui'
+  color: 'ff79c6'
+  description: 'Design tokens, UI primitives, and chart wrappers'
+
+- name: 'database'
+  color: 'e36209'
+  description: 'Database schemas, migrations, and Drizzle models'
+
+- name: 'ci'
+  color: '6f42c1'
+  description: 'GitHub Actions CI/CD workflows and automation'
+
+- name: 'documentation'
+  color: '0075ca'
+  description: 'README, guides, API documentation'
+
+- name: 'bug'
+  color: 'd73a4a'
+  description: "Something isn't working as intended"
+
+- name: 'enhancement'
+  color: 'a2eeef'
+  description: 'New feature or enhancement'
+
+- name: 'dependencies'
+  color: '0366d6'
+  description: 'Dependency updates and lockfile changes'

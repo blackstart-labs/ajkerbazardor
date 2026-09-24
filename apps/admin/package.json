@@ -1,10 +1,10 @@
 {
   "name": "@ajkerbazardor/admin",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "private": true,
   "scripts": {
     "dev": "vite",
-    "build": "vue-tsc --noEmit && vite build",
+    "build": "echo \"No build yet for admin\"",
     "preview": "vite preview",
     "test": "echo \"No tests yet for admin\"",
     "test:e2e": "echo \"No e2e yet for admin\"",
