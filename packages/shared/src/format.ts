@@ -122,8 +122,10 @@ const timeFormatter = new Intl.DateTimeFormat(BN_BD, {
 /**
  * Format a YYYY-MM-DD string as "২৪ সেপ্টেম্বর ২০২৬".
  */
-export function formatBnDate(isoDate: string): string {
+export function formatBnDate(isoDate: string | null | undefined): string {
+  if (!isoDate || typeof isoDate !== 'string' || !isoDate.includes('-')) return '—';
   const [year, month, day] = isoDate.split('-').map(Number) as [number, number, number];
+  if (!year || !month || !day) return '—';
   const dayBn = plainNumberFormatter.format(day);
   const monthBn = BANGLA_MONTHS[(month - 1) % 12] ?? '';
   const yearBn = plainNumberFormatter.format(year);
@@ -133,10 +135,12 @@ export function formatBnDate(isoDate: string): string {
 /**
  * Format a YYYY-MM-DD string as "বৃহস্পতিবার, ২৪ সেপ্টেম্বর".
  */
-export function formatBnDateWithDay(isoDate: string): string {
+export function formatBnDateWithDay(isoDate: string | null | undefined): string {
+  if (!isoDate || typeof isoDate !== 'string' || !isoDate.includes('-')) return '—';
   const date = new Date(`${isoDate}T00:00:00+06:00`);
   const dayOfWeek = BANGLA_DAYS[date.getDay()] ?? '';
   const [, month, day] = isoDate.split('-').map(Number) as [number, number, number];
+  if (!month || !day) return '—';
   const dayBn = plainNumberFormatter.format(day);
   const monthBn = BANGLA_MONTHS[(month - 1) % 12] ?? '';
   return `${dayOfWeek}, ${dayBn} ${monthBn}`;

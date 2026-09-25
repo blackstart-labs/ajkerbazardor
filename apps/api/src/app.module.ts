@@ -14,6 +14,7 @@ import { HealthModule } from './health/health.module.js';
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
+      envFilePath: ['.env', 'apps/api/.env', '../apps/api/.env'],
       validate: (config) => {
         const result = envSchema.safeParse(config);
         if (!result.success) {

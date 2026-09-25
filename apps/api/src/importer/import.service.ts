@@ -357,6 +357,7 @@ export class ImportService {
       .select({
         id: revisions.id,
         reportId: revisions.reportId,
+        date: reports.date,
         reportDate: reports.date,
         reportStatus: reports.status,
         isCurrent: sql<boolean>`${reports.currentRevisionId} = ${revisions.id}`,

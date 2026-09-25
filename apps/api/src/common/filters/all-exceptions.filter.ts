@@ -43,10 +43,24 @@ export class AllExceptionsFilter implements ExceptionFilter {
       };
     } else {
       // Unexpected — log full error, return generic message
-      this.logger.error('Unhandled exception', exception instanceof Error ? exception.stack : String(exception));
+      const cause = (exception as Record<string, unknown>)?.cause;
+      this.logger.error(
+        `Unhandled exception: ${exception instanceof Error ? exception.message : String(exception)}`,
+        cause instanceof Error
+          ? cause.stack
+          : cause
+            ? JSON.stringify(cause)
+            : exception instanceof Error
+              ? exception.stack
+              : String(exception),
+      );
       response = {
         ok: false,
-        error: { code: 'INTERNAL_ERROR', message: 'কিছু একটা গড়বড় হয়েছে। আবার চেষ্টা করুন।' },
+        error: {
+          code: 'INTERNAL_ERROR',
+          message: 'কিছু একটা গড়বড় হয়েছে। আবার চেষ্টা করুন।',
+          details: exception instanceof Error ? exception.message : undefined,
+        },
       };
     }
 

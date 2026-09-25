@@ -173,10 +173,21 @@ async function undoRevision(revisionId: number) {
         </thead>
         <tbody>
           <tr v-for="rev in revisions" :key="rev.id">
-            <td class="font-bn">{{ formatBnDate(rev.date) }}</td>
-            <td class="font-bn">{{ formatBnInt(rev.productCount) }}</td>
+            <td class="font-bn">{{ formatBnDate(rev.date || (rev as any).reportDate) }}</td>
+            <td class="font-bn">{{ formatBnInt(rev.productCount ?? (rev as any).stats?.productCount ?? 0) }}</td>
             <td>
-              <span v-if="rev.warnings > 0" class="badge badge--warn">{{ rev.warnings }} সতর্কতা</span>
+              <span
+                v-if="
+                  (typeof rev.warnings === 'number'
+                    ? rev.warnings
+                    : Array.isArray(rev.warnings)
+                      ? rev.warnings.length
+                      : 0) > 0
+                "
+                class="badge badge--warn"
+              >
+                {{ typeof rev.warnings === 'number' ? rev.warnings : rev.warnings.length }} সতর্কতা
+              </span>
               <span v-else class="badge badge--ok">✓</span>
             </td>
             <td class="text-muted text-sm">{{ new Date(rev.createdAt).toLocaleString('bn-BD') }}</td>
