@@ -105,7 +105,7 @@ async function switchRange(range: string) {
               'pdp__change-badge--down': product.direction === 'down',
             }"
           >
-            {{ formatChangePct(product.changePct) }}
+            {{ formatChangePct(product.changePct ?? null) }}
             <span class="pdp__change-since">গতকাল থেকে</span>
           </div>
         </div>
@@ -133,7 +133,7 @@ async function switchRange(range: string) {
               'context-card__pct--down': ctx.direction === 'down',
             }"
           >
-            {{ formatChangePct(ctx.changePct) }}
+            {{ formatChangePct(ctx.changePct ?? null) }}
           </span>
         </div>
       </div>

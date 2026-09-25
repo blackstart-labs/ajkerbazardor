@@ -17,7 +17,11 @@ export const envSchema = z.object({
   // Server
   PORT: z.coerce.number().int().positive().default(3000),
   NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
-  CORS_ORIGIN: z.string().default('http://localhost:3001,http://localhost:3002'),
+  CORS_ORIGIN: z
+    .string()
+    .default(
+      'http://localhost:3001,http://localhost:3002,https://ajkerbazardor.vercel.app,https://ajkerbazardoor.vercel.app',
+    ),
 
   // Storage
   STORAGE_DRIVER: z.enum(['local', 's3']).default('local'),

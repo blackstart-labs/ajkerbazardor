@@ -13,6 +13,7 @@ export default [
       '**/dist/**',
       '**/.output/**',
       '**/.nuxt/**',
+      '**/.vercel/**',
       '**/node_modules/**',
       '**/coverage/**',
       '**/drizzle/migrations/**',
