@@ -1,7 +1,12 @@
 // Typed API client for the admin SPA
 import { ofetch, type FetchOptions } from 'ofetch';
 
-const BASE = import.meta.env['VITE_API_BASE'] ?? 'https://api-tawny-pi-32.vercel.app/api/v1';
+const defaultBase =
+  typeof window !== 'undefined' && window.location.hostname === 'localhost'
+    ? 'http://localhost:3000/api/v1'
+    : 'https://api-tawny-pi-32.vercel.app/api/v1';
+
+const BASE = import.meta.env['VITE_API_BASE'] || defaultBase;
 
 const STORAGE_KEY = 'admin_access_token';
 

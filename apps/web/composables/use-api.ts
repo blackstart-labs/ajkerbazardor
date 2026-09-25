@@ -1,6 +1,9 @@
 // Composable: typed wrapper around the public API
 export function useApi() {
-  let base = 'https://api-tawny-pi-32.vercel.app/api/v1';
+  const isLocal =
+    process.env.NODE_ENV !== 'production' ||
+    (typeof window !== 'undefined' && window.location.hostname === 'localhost');
+  let base = isLocal ? 'http://localhost:3000/api/v1' : 'https://api-tawny-pi-32.vercel.app/api/v1';
   try {
     const config = useRuntimeConfig();
     if (config.public?.apiBase) {

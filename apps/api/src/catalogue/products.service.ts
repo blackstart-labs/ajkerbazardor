@@ -75,9 +75,9 @@ export class ProductsService {
 
     const whereClause = conditions.length > 0 ? and(...conditions) : undefined;
 
-    const [totalRow] = await this.db.select({ count: count() }).from(schema.products).where(whereClause);
+    const totalPromise = this.db.select({ count: count() }).from(schema.products).where(whereClause);
 
-    const items = await this.db
+    const itemsPromise = this.db
       .select({
         id: schema.products.id,
         slug: schema.products.slug,
@@ -102,6 +102,8 @@ export class ProductsService {
       .orderBy(desc(schema.products.id))
       .limit(limit)
       .offset(offset);
+
+    const [[totalRow], items] = await Promise.all([totalPromise, itemsPromise]);
 
     return {
       items: items.map((i) => ({

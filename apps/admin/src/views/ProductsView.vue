@@ -59,9 +59,15 @@ async function loadProducts() {
   }
 }
 
+let searchTimeout: ReturnType<typeof setTimeout> | null = null;
 function onSearch() {
-  page.value = 1;
-  loadProducts();
+  if (searchTimeout) {
+    clearTimeout(searchTimeout);
+  }
+  searchTimeout = setTimeout(() => {
+    page.value = 1;
+    loadProducts();
+  }, 300);
 }
 
 async function toggleActive(product: Product) {

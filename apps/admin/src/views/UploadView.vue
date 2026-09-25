@@ -41,6 +41,12 @@ async function loadRevisions() {
   }
 }
 
+function getWarningCount(warnings: unknown): number {
+  if (typeof warnings === 'number') return warnings;
+  if (Array.isArray(warnings)) return warnings.length;
+  return 0;
+}
+
 // ── File Selection ──────────────────────────────────────────────────────────
 function onFileChange(event: Event) {
   const input = event.target as HTMLInputElement;
@@ -176,17 +182,8 @@ async function undoRevision(revisionId: number) {
             <td class="font-bn">{{ formatBnDate(rev.date || (rev as any).reportDate) }}</td>
             <td class="font-bn">{{ formatBnInt(rev.productCount ?? (rev as any).stats?.productCount ?? 0) }}</td>
             <td>
-              <span
-                v-if="
-                  (typeof rev.warnings === 'number'
-                    ? rev.warnings
-                    : Array.isArray(rev.warnings)
-                      ? rev.warnings.length
-                      : 0) > 0
-                "
-                class="badge badge--warn"
-              >
-                {{ typeof rev.warnings === 'number' ? rev.warnings : rev.warnings.length }} সতর্কতা
+              <span v-if="getWarningCount(rev.warnings) > 0" class="badge badge--warn">
+                {{ getWarningCount(rev.warnings) }} সতর্কতা
               </span>
               <span v-else class="badge badge--ok">✓</span>
             </td>
