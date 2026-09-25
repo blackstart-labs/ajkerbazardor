@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "nest start --watch",
     "start:dev": "nest start --watch",
-    "build": "tsc -p tsconfig.build.json",
+    "build": "pnpm --filter @ajkerbazardor/shared build && tsc -p tsconfig.build.json",
     "start": "node dist/main.js",
     "test": "jest --passWithNoTests",
     "test:e2e": "jest --config jest.e2e.config.js --forceExit",
