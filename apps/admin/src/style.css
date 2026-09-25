@@ -24,12 +24,19 @@ body {
   min-height: 100dvh;
 }
 
-img, picture, video, canvas, svg {
+img,
+picture,
+video,
+canvas,
+svg {
   display: block;
   max-width: 100%;
 }
 
-input, button, textarea, select {
+input,
+button,
+textarea,
+select {
   font: inherit;
 }
 
@@ -39,8 +46,13 @@ input, button, textarea, select {
   scrollbar-color: var(--color-border-strong) transparent;
 }
 
-*::-webkit-scrollbar { width: 6px; height: 6px; }
-*::-webkit-scrollbar-track { background: transparent; }
+*::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
 *::-webkit-scrollbar-thumb {
   background-color: var(--color-border-strong);
   border-radius: 3px;
@@ -67,13 +79,25 @@ input, button, textarea, select {
 }
 
 /* ── Utility classes ─────────────────────────────────────────────────────── */
-.text-muted { color: var(--color-text-muted); }
-.text-brand { color: var(--color-brand-primary); }
-.text-up { color: var(--color-trend-up); }
-.text-down { color: var(--color-trend-down); }
+.text-muted {
+  color: var(--color-text-muted);
+}
+.text-brand {
+  color: var(--color-brand-primary);
+}
+.text-up {
+  color: var(--color-trend-up);
+}
+.text-down {
+  color: var(--color-trend-down);
+}
 
-.font-bn { font-family: var(--font-body); }
-.font-heading { font-family: var(--font-heading); }
+.font-bn {
+  font-family: var(--font-body);
+}
+.font-heading {
+  font-family: var(--font-heading);
+}
 
 /* Admin Link */
 a {

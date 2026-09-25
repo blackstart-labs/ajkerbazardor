@@ -3,10 +3,11 @@
   "version": "1.0.0",
   "private": true,
   "type": "commonjs",
+  "main": "dist/main.js",
   "scripts": {
     "dev": "nest start --watch",
     "start:dev": "nest start --watch",
-    "build": "pnpm --filter @ajkerbazardor/shared build && tsc -p tsconfig.build.json && node scripts/prepare-vercel.js",
+    "build": "pnpm --filter @ajkerbazardor/shared build && tsc -p tsconfig.build.json",
     "start": "node dist/main.js",
     "test": "jest --passWithNoTests",
     "test:e2e": "jest --config jest.e2e.config.js --forceExit",
