@@ -23,15 +23,33 @@ async function bootstrap() {
     },
   });
 
-  // CORS
-  const corsOrigins = (process.env['CORS_ORIGIN'] ?? 'http://localhost:3001,http://localhost:3002').split(',');
+  // Dynamic CORS: allow localhost, production Vercel domains, and *.vercel.app previews
+  const defaultOrigins = [
+    'http://localhost:3001',
+    'http://localhost:3002',
+    'https://ajkerbazardor.vercel.app',
+    'https://ajkerbazardoor.vercel.app',
+  ];
+  const rawOrigins = process.env['CORS_ORIGIN']
+    ? process.env['CORS_ORIGIN'].split(',').map((s) => s.trim().replace(/\/$/, ''))
+    : defaultOrigins;
+
   app.enableCors({
-    origin: corsOrigins,
+    origin: (origin, callback) => {
+      if (!origin) return callback(null, true);
+      const cleanOrigin = origin.replace(/\/$/, '');
+      if (rawOrigins.includes(origin) || rawOrigins.includes(cleanOrigin) || /\.vercel\.app$/.test(cleanOrigin)) {
+        return callback(null, true);
+      }
+      return callback(null, false);
+    },
     credentials: true,
   });
 
   // Global prefix for all routes
-  app.setGlobalPrefix('api/v1');
+  app.setGlobalPrefix('api/v1', {
+    exclude: ['health', 'api/v1/health'],
+  });
 
   // Global validation pipe (zod-based)
   app.useGlobalPipes(new ZodValidationPipe());

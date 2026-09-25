@@ -1,10 +1,10 @@
 import { Injectable, Inject, UnauthorizedException, Logger, type OnApplicationBootstrap } from '@nestjs/common';
-// eslint-disable-next-line @typescript-eslint/consistent-type-imports
+
 import { JwtService } from '@nestjs/jwt';
-// eslint-disable-next-line @typescript-eslint/consistent-type-imports
+
 import { ConfigService } from '@nestjs/config';
 import type { LibSQLDatabase } from 'drizzle-orm/libsql';
-import * as argon2 from 'argon2';
+import * as bcrypt from 'bcryptjs';
 import { eq, sql } from 'drizzle-orm';
 import { DRIZZLE } from '../drizzle/drizzle.module.js';
 import type * as schema from '../drizzle/schema.js';
@@ -18,8 +18,8 @@ export class AuthService implements OnApplicationBootstrap {
 
   constructor(
     @Inject(DRIZZLE) private readonly db: LibSQLDatabase<typeof schema>,
-    private readonly jwtService: JwtService,
-    private readonly configService: ConfigService<Env, true>,
+    @Inject(JwtService) private readonly jwtService: JwtService,
+    @Inject(ConfigService) private readonly configService: ConfigService<Env, true>,
   ) {}
 
   async onApplicationBootstrap() {
@@ -34,7 +34,7 @@ export class AuthService implements OnApplicationBootstrap {
       if (count === 0) {
         const email = this.configService.get('ADMIN_EMAIL');
         const password = this.configService.get('ADMIN_PASSWORD');
-        const passwordHash = await argon2.hash(password);
+        const passwordHash = await bcrypt.hash(password, 10);
 
         await this.db.insert(users).values({
           email,
@@ -59,7 +59,7 @@ export class AuthService implements OnApplicationBootstrap {
       throw new UnauthorizedException('Invalid credentials');
     }
 
-    const valid = await argon2.verify(user.passwordHash, pass);
+    const valid = await bcrypt.compare(pass, user.passwordHash);
     if (!valid) {
       throw new UnauthorizedException('Invalid credentials');
     }

@@ -4,7 +4,7 @@ import type { LibSQLDatabase } from 'drizzle-orm/libsql';
 import { normaliseName } from '@ajkerbazardor/shared';
 import { DRIZZLE } from '../drizzle/drizzle.module.js';
 import * as schema from '../drizzle/schema.js';
-// eslint-disable-next-line @typescript-eslint/consistent-type-imports
+
 import { AuditService } from '../audit/audit.service.js';
 
 export interface AdminProductFilter {
@@ -48,7 +48,7 @@ export interface ApproveProductDto {
 export class ProductsService {
   constructor(
     @Inject(DRIZZLE) private readonly db: LibSQLDatabase<typeof schema>,
-    private readonly auditService: AuditService,
+    @Inject(AuditService) private readonly auditService: AuditService,
   ) {}
 
   async findAdmin(filter: AdminProductFilter) {

@@ -1,0 +1,11 @@
+export { default as IconSearch } from './IconSearch.vue';
+export { default as IconHeart } from './IconHeart.vue';
+export { default as IconTrendUp } from './IconTrendUp.vue';
+export { default as IconTrendDown } from './IconTrendDown.vue';
+export { default as IconTrendSame } from './IconTrendSame.vue';
+export { default as IconFilter } from './IconFilter.vue';
+export { default as IconSort } from './IconSort.vue';
+export { default as IconCalendar } from './IconCalendar.vue';
+export { default as IconShare } from './IconShare.vue';
+export { default as IconMoon } from './IconMoon.vue';
+export { default as IconSun } from './IconSun.vue';

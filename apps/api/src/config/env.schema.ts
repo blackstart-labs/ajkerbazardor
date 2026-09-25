@@ -17,11 +17,15 @@ export const envSchema = z.object({
   // Server
   PORT: z.coerce.number().int().positive().default(3000),
   NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
-  CORS_ORIGIN: z.string().default('http://localhost:3001,http://localhost:3002'),
+  CORS_ORIGIN: z
+    .string()
+    .default(
+      'http://localhost:3001,http://localhost:3002,https://ajkerbazardor.vercel.app,https://ajkerbazardoor.vercel.app',
+    ),
 
   // Storage
   STORAGE_DRIVER: z.enum(['local', 's3']).default('local'),
-  STORAGE_PUBLIC_URL: z.string().url().default('http://localhost:3000/uploads'),
+  STORAGE_PUBLIC_URL: z.string().default('http://localhost:3000/uploads'),
   S3_BUCKET: z.string().optional(),
   S3_ENDPOINT: z.string().optional(),
   S3_ACCESS_KEY: z.string().optional(),

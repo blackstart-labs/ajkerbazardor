@@ -1,11 +1,22 @@
-import { Controller, Post, Get, Param, Req, Query, UseGuards, BadRequestException, ParseIntPipe } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Get,
+  Param,
+  Req,
+  Query,
+  UseGuards,
+  BadRequestException,
+  ParseIntPipe,
+  Inject,
+} from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiBearerAuth, ApiConsumes, ApiQuery } from '@nestjs/swagger';
 import type { FastifyRequest } from 'fastify';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard.js';
 import { CurrentUser } from '../auth/decorators/current-user.decorator.js';
 import { RolesGuard } from '../auth/guards/roles.guard.js';
 import { Roles } from '../auth/decorators/roles.decorator.js';
-// eslint-disable-next-line @typescript-eslint/consistent-type-imports
+
 import { ImportService } from './import.service.js';
 import type { User } from '../drizzle/schema.js';
 
@@ -15,7 +26,7 @@ import type { User } from '../drizzle/schema.js';
 @Roles('admin', 'editor')
 @Controller()
 export class ImportController {
-  constructor(private readonly importService: ImportService) {}
+  constructor(@Inject(ImportService) private readonly importService: ImportService) {}
 
   @Post('admin/imports')
   @ApiConsumes('multipart/form-data')
@@ -54,7 +65,7 @@ export class ImportController {
     };
   }
 
-  @Get('admin/imports')
+  @Get(['admin/imports', 'importer/revisions'])
   @ApiOperation({ summary: 'List recent imports across all dates' })
   @ApiQuery({ name: 'limit', required: false, type: Number })
   @ApiQuery({ name: 'offset', required: false, type: Number })

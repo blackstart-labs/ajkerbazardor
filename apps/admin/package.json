@@ -2,13 +2,29 @@
   "name": "@ajkerbazardor/admin",
   "version": "1.0.0",
   "private": true,
+  "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "echo \"No build yet for admin\"",
+    "build": "pnpm --filter @ajkerbazardor/shared build && vue-tsc --noEmit && vite build",
     "preview": "vite preview",
     "test": "echo \"No tests yet for admin\"",
     "test:e2e": "echo \"No e2e yet for admin\"",
     "test:coverage": "echo \"No coverage yet for admin\"",
-    "typecheck": "echo \"No typecheck yet for admin\""
+    "typecheck": "vue-tsc --noEmit"
+  },
+  "dependencies": {
+    "@ajkerbazardor/shared": "workspace:*",
+    "@ajkerbazardor/ui": "workspace:*",
+    "@vueuse/core": "^13.2.0",
+    "ofetch": "^1.4.1",
+    "pinia": "^3.0.2",
+    "vue": "^3.5.16",
+    "vue-router": "^4.5.1"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^5.2.1",
+    "typescript": "^5.7.3",
+    "vite": "^5.4.19",
+    "vue-tsc": "^2.1.10"
   }
 }

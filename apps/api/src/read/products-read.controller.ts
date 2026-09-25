@@ -1,6 +1,6 @@
-import { Controller, Get, Param, Query, UseInterceptors } from '@nestjs/common';
+import { Controller, Get, Param, Query, UseInterceptors, Inject } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiQuery, ApiParam } from '@nestjs/swagger';
-// eslint-disable-next-line @typescript-eslint/consistent-type-imports
+
 import { ProductsReadService } from './products-read.service.js';
 import { HttpCacheInterceptor } from './http-cache.interceptor.js';
 
@@ -8,7 +8,7 @@ import { HttpCacheInterceptor } from './http-cache.interceptor.js';
 @Controller('products')
 @UseInterceptors(HttpCacheInterceptor)
 export class ProductsReadController {
-  constructor(private readonly productsService: ProductsReadService) {}
+  constructor(@Inject(ProductsReadService) private readonly productsService: ProductsReadService) {}
 
   @Get()
   @ApiOperation({ summary: 'List public products with storefront cards, filters, and sparklines' })

@@ -1,6 +1,6 @@
-import { Controller, Get, Query, UseInterceptors } from '@nestjs/common';
+import { Controller, Get, Query, UseInterceptors, Inject } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiQuery } from '@nestjs/swagger';
-// eslint-disable-next-line @typescript-eslint/consistent-type-imports
+
 import { DashboardReadService } from './dashboard-read.service.js';
 import { HttpCacheInterceptor } from './http-cache.interceptor.js';
 
@@ -8,7 +8,7 @@ import { HttpCacheInterceptor } from './http-cache.interceptor.js';
 @Controller('dashboard')
 @UseInterceptors(HttpCacheInterceptor)
 export class DashboardReadController {
-  constructor(private readonly dashboardService: DashboardReadService) {}
+  constructor(@Inject(DashboardReadService) private readonly dashboardService: DashboardReadService) {}
 
   @Get('summary')
   @ApiOperation({ summary: 'Get daily market overview summary, counts, shares, top movers' })
