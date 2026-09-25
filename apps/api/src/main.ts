@@ -1,6 +1,7 @@
 import 'reflect-metadata';
 import { createNestApp } from './setup.js';
 
+// Local dev — standard long-running server
 async function bootstrap() {
   const app = await createNestApp();
   const port = process.env['PORT'] ?? 3000;
