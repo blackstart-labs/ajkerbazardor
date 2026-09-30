@@ -1,12 +1,16 @@
+import 'reflect-metadata';
+import { NestFactory } from '@nestjs/core';
 import { createNestApp } from './setup.js';
+import handler from './serverless.js';
 
-async function bootstrap() {
+export async function bootstrap(): Promise<void> {
   const app = await createNestApp();
-  const port = process.env['PORT'] ?? 3000;
+  const port = Number(process.env['PORT'] ?? 3000);
   await app.listen(port, '0.0.0.0');
   console.warn(`API listening on port ${port} — docs at http://localhost:${port}/api/docs`);
 }
 
+// Start application for local server and Vercel Fluid compute execution
 bootstrap().catch(async (err: unknown) => {
   console.error('Failed to start API:', err);
   const http = await import('node:http');
@@ -35,3 +39,16 @@ bootstrap().catch(async (err: unknown) => {
   const port = Number(process.env['PORT'] ?? 3000);
   server.listen(port, '0.0.0.0');
 });
+
+export { NestFactory, createNestApp, handler };
+export default handler;
+
+// CommonJS interoperability for @vercel/node and serverless runtimes
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = handler;
+  module.exports.default = handler;
+  module.exports.handler = handler;
+  module.exports.bootstrap = bootstrap;
+  module.exports.createNestApp = createNestApp;
+  module.exports.NestFactory = NestFactory;
+}

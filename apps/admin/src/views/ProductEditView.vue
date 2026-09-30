@@ -154,56 +154,70 @@ async function save() {
 .product-edit__header {
   display: flex;
   align-items: center;
-  gap: var(--space-4);
-  margin-bottom: var(--space-6);
+  gap: 16px;
+  margin-bottom: 24px;
 }
 .back-btn {
-  background: transparent;
-  border: none;
-  color: var(--color-brand-primary);
+  background: var(--color-bg-surface);
+  border: 1px solid var(--color-border-subtle);
+  color: var(--color-text-secondary);
   font-weight: 600;
   font-size: var(--text-sm);
+  padding: 8px 16px;
+  border-radius: 9999px;
   cursor: pointer;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+  transition: all 0.15s ease;
+}
+.back-btn:hover {
+  background: var(--color-bg-subtle);
+  color: var(--color-coral-primary);
+  border-color: var(--color-coral-border);
 }
 .page-title {
   font-family: var(--font-heading);
   font-size: var(--text-2xl);
   font-weight: 700;
+  color: var(--color-text-primary);
 }
 .skeleton-form {
   height: 400px;
-  border-radius: var(--radius-lg);
-  background: linear-gradient(90deg, var(--color-bg-muted) 25%, var(--color-bg-subtle) 50%, var(--color-bg-muted) 75%);
-  background-size: 200% 100%;
+  border-radius: var(--card-radius, 22px);
+  background: #ffffff;
+  box-shadow: var(--card-shadow);
   animation: shimmer 1.5s infinite;
 }
 @keyframes shimmer {
   0% {
-    background-position: 200% 0;
+    opacity: 0.6;
+  }
+  50% {
+    opacity: 1;
   }
   100% {
-    background-position: -200% 0;
+    opacity: 0.6;
   }
 }
 .edit-form {
-  max-width: 560px;
+  max-width: 620px;
   background: var(--color-bg-surface);
   border: 1px solid var(--color-border-subtle);
-  border-radius: var(--radius-lg);
-  padding: var(--space-6);
-  box-shadow: var(--shadow-card);
+  border-radius: var(--card-radius, 22px);
+  padding: 32px;
+  box-shadow: var(--card-shadow);
   display: flex;
   flex-direction: column;
-  gap: var(--space-4);
+  gap: 20px;
 }
 .form-row {
   display: flex;
   flex-direction: column;
-  gap: var(--space-1-5);
+  gap: 6px;
 }
 .form-row--checkbox {
   flex-direction: row;
   align-items: center;
+  gap: 10px;
 }
 .form-label {
   font-size: var(--text-sm);
@@ -211,33 +225,35 @@ async function save() {
   color: var(--color-text-secondary);
 }
 .form-input {
-  height: 44px;
-  padding: 0 var(--space-3);
-  border: 1.5px solid var(--color-border-strong);
-  border-radius: var(--radius-md);
+  height: 46px;
+  padding: 0 16px;
+  border: 1.5px solid var(--color-border-subtle);
+  border-radius: 12px;
   background: var(--color-bg-canvas);
   color: var(--color-text-primary);
   font-size: var(--text-base);
   outline: none;
-  transition: border-color var(--duration-fast);
+  transition: all 0.15s ease;
 }
 .form-input:focus {
-  border-color: var(--color-brand-primary);
-  box-shadow: 0 0 0 3px var(--color-brand-subtle);
+  border-color: var(--color-coral-primary);
+  box-shadow: 0 0 0 3px var(--color-coral-subtle);
+  background: #ffffff;
 }
 .form-checkbox {
-  width: 18px;
-  height: 18px;
-  accent-color: var(--color-brand-primary);
+  width: 20px;
+  height: 20px;
+  accent-color: var(--color-coral-primary);
   cursor: pointer;
 }
 .price-info {
   display: flex;
-  gap: var(--space-2);
+  gap: 10px;
   align-items: center;
-  padding: var(--space-3);
-  background: var(--color-bg-subtle);
-  border-radius: var(--radius-md);
+  padding: 14px 18px;
+  background: var(--color-bg-canvas);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: 12px;
   font-size: var(--text-sm);
 }
 .price-info__label {
@@ -247,52 +263,60 @@ async function save() {
 .price-info__value {
   font-family: var(--font-body);
   font-weight: 700;
+  font-size: var(--text-base);
   color: var(--color-text-primary);
 }
 .form-actions {
   display: flex;
-  gap: var(--space-3);
-  padding-top: var(--space-2);
+  gap: 12px;
+  padding-top: 8px;
 }
 .save-btn {
   display: inline-flex;
   align-items: center;
-  gap: var(--space-2);
-  height: 44px;
-  padding: 0 var(--space-6);
-  background: var(--color-brand-primary);
+  gap: 8px;
+  height: 48px;
+  padding: 0 28px;
+  background: var(--color-coral-gradient);
   color: #fff;
   border: none;
-  border-radius: var(--radius-md);
+  border-radius: 9999px;
   font-weight: 700;
   font-size: var(--text-base);
   cursor: pointer;
-  transition: background-color var(--duration-fast);
+  box-shadow: var(--color-coral-glow);
+  transition:
+    transform 0.18s var(--ease-spring),
+    box-shadow 0.18s ease;
 }
 .save-btn:hover:not(:disabled) {
-  background: var(--color-brand-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 10px 24px rgba(244, 68, 46, 0.35);
 }
 .save-btn:disabled {
   opacity: 0.6;
   cursor: not-allowed;
+  box-shadow: none;
 }
 .cancel-btn {
-  height: 44px;
-  padding: 0 var(--space-4);
-  border: 1.5px solid var(--color-border-strong);
-  background: transparent;
+  height: 48px;
+  padding: 0 22px;
+  border: 1px solid var(--color-border-subtle);
+  background: var(--color-bg-surface);
   color: var(--color-text-secondary);
-  border-radius: var(--radius-md);
+  border-radius: 9999px;
   font-size: var(--text-base);
+  font-weight: 600;
   cursor: pointer;
-  transition: all var(--duration-fast);
+  transition: all 0.15s ease;
 }
 .cancel-btn:hover {
   background: var(--color-bg-subtle);
+  color: var(--color-text-primary);
 }
 .spinner {
-  width: 16px;
-  height: 16px;
+  width: 18px;
+  height: 18px;
   border: 2px solid rgba(255, 255, 255, 0.3);
   border-top-color: #fff;
   border-radius: 50%;
@@ -304,18 +328,19 @@ async function save() {
   }
 }
 .alert {
-  padding: var(--space-3) var(--space-4);
-  border-radius: var(--radius-md);
+  padding: 12px 18px;
+  border-radius: 12px;
   font-size: var(--text-sm);
+  font-weight: 600;
 }
 .alert--error {
   background: var(--color-trend-up-bg);
-  color: var(--color-trend-up-text);
+  color: var(--color-trend-up);
   border: 1px solid var(--color-trend-up-border);
 }
 .alert--success {
-  background: var(--color-trend-down-bg);
-  color: var(--color-trend-down-text);
+  background: var(--color-accent-green-subtle);
+  color: var(--color-accent-green);
   border: 1px solid var(--color-trend-down-border);
 }
 </style>

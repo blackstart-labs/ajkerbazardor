@@ -64,6 +64,14 @@ function onSubmit() {
           </svg>
         </button>
       </form>
+
+      <nav class="site-header__nav" aria-label="প্রধান নেভিগেশন">
+        <NuxtLink to="/prices">বাজারদর</NuxtLink>
+        <NuxtLink to="/markets">বাজারসমূহ</NuxtLink>
+        <NuxtLink to="/changes">পরিবর্তন</NuxtLink>
+        <NuxtLink to="/analytics">রিপোর্ট</NuxtLink>
+        <NuxtLink to="/about">তথ্য</NuxtLink>
+      </nav>
     </div>
   </header>
 </template>
@@ -286,9 +294,32 @@ function onSubmit() {
   color: var(--color-brand-primary);
 }
 
+.site-header__nav {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  font-size: var(--text-sm);
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.site-header__nav a {
+  color: var(--color-text-secondary);
+  text-decoration: none;
+}
+
+.site-header__nav a:hover,
+.site-header__nav a.router-link-active {
+  color: var(--color-brand-primary);
+}
+
 /* ── Responsive ──────────────────────────────────────────────────────────── */
 @media (max-width: 980px) {
   .site-header__date {
+    display: none;
+  }
+
+  .site-header__nav {
     display: none;
   }
 }

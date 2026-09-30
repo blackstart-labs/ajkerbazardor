@@ -59,7 +59,6 @@ export class AllExceptionsFilter implements ExceptionFilter {
         error: {
           code: 'INTERNAL_ERROR',
           message: 'কিছু একটা গড়বড় হয়েছে। আবার চেষ্টা করুন।',
-          details: exception instanceof Error ? exception.message : undefined,
         },
       };
     }

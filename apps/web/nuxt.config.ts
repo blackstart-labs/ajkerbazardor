@@ -1,7 +1,9 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 import { fileURLToPath } from 'node:url';
 import { join } from 'node:path';
-import { DEFAULT_PUBLIC_API_BASE } from '@ajkerbazardor/shared';
+
+const DEFAULT_PUBLIC_API_BASE = 'https://api-tawny-pi-32.vercel.app/api/v1';
+const apiProxyTarget = process.env['NUXT_API_PROXY_TARGET'] || 'https://api-tawny-pi-32.vercel.app';
 
 const uiRoot = fileURLToPath(new URL('../../packages/ui/src', import.meta.url));
 
@@ -20,7 +22,16 @@ export default defineNuxtConfig({
     public: {
       apiBase:
         process.env['NUXT_PUBLIC_API_BASE'] ||
-        (process.env.NODE_ENV === 'production' ? DEFAULT_PUBLIC_API_BASE : 'http://localhost:3000/api/v1'),
+        (process.env.NODE_ENV === 'production' ? DEFAULT_PUBLIC_API_BASE : '/api/v1'),
+    },
+  },
+
+  nitro: {
+    devProxy: {
+      '/api/v1': {
+        target: apiProxyTarget,
+        changeOrigin: true,
+      },
     },
   },
 
