@@ -86,6 +86,55 @@ export interface HeatmapResponse {
   }>;
 }
 
+export interface BengaliAnalyticsReportResponse {
+  reportDate: string;
+  titleBn: string;
+  executiveSummaryBn: string;
+  keyFindingsBn: string[];
+  marketCoverage: {
+    marketCount: number;
+    productCount: number;
+    markets: string[];
+  };
+  movement: {
+    upCount: number;
+    downCount: number;
+    sameCount: number;
+    shareUp: number;
+    shareDown: number;
+    shareSame: number;
+    averageChangePct: number;
+  };
+  categoryBreakdown: Array<{
+    categorySlug: string;
+    categoryNameBn: string;
+    productCount: number;
+    availableCount: number;
+    averageMid: number | null;
+    missingCount: number;
+  }>;
+  topMovers: {
+    risers: MoverItem[];
+    fallers: MoverItem[];
+  };
+  historicalTrend: Array<{
+    date: string;
+    averageMid: number | null;
+    availableCount: number;
+  }>;
+  analysisBn: {
+    marketMood: string;
+    strongestCategory: string | null;
+    weakestDataCategory: string | null;
+    volatilityNote: string;
+  };
+  dataQuality: {
+    missingCurrentPrices: number;
+    productsNeedingReview: number;
+    sparseHistoryNoteBn: string;
+  };
+}
+
 @Injectable()
 export class DashboardReadService {
   constructor(@Inject(DRIZZLE) private readonly db: LibSQLDatabase<typeof schema>) {}
@@ -575,6 +624,187 @@ export class DashboardReadService {
     return {
       dates,
       categories: resultCategories,
+    };
+  }
+
+  async getAnalyticsReport(date?: string): Promise<BengaliAnalyticsReportResponse> {
+    const report = await this.getTargetReport(date);
+    if (!report.currentRevisionId) {
+      throw new NotFoundException('Report has no current revision');
+    }
+
+    const summary = await this.getSummary(date);
+
+    let markets: string[] = [];
+    try {
+      markets = JSON.parse(report.markets || '[]');
+    } catch {
+      markets = [];
+    }
+
+    const rows = await this.db
+      .select({
+        productId: products.id,
+        needsReview: products.needsReview,
+        categorySlug: categories.slug,
+        categoryNameBn: categories.nameBn,
+        min: priceEntries.min,
+        max: priceEntries.max,
+      })
+      .from(products)
+      .innerJoin(categories, eq(products.categoryId, categories.id))
+      .leftJoin(
+        priceEntries,
+        and(eq(priceEntries.productId, products.id), eq(priceEntries.revisionId, report.currentRevisionId)),
+      )
+      .where(isNull(products.archivedAt));
+
+    const categoryMap = new Map<
+      string,
+      { categorySlug: string; categoryNameBn: string; productCount: number; availableCount: number; mids: number[] }
+    >();
+    let missingCurrentPrices = 0;
+    let productsNeedingReview = 0;
+
+    for (const row of rows) {
+      const bucket = categoryMap.get(row.categorySlug) ?? {
+        categorySlug: row.categorySlug,
+        categoryNameBn: row.categoryNameBn,
+        productCount: 0,
+        availableCount: 0,
+        mids: [],
+      };
+      bucket.productCount++;
+
+      if (row.needsReview) productsNeedingReview++;
+
+      const currentMid = mid(row.min ?? null, row.max ?? null);
+      if (currentMid === null) {
+        missingCurrentPrices++;
+      } else {
+        bucket.availableCount++;
+        bucket.mids.push(currentMid);
+      }
+
+      categoryMap.set(row.categorySlug, bucket);
+    }
+
+    const categoryBreakdown = Array.from(categoryMap.values()).map((bucket) => ({
+      categorySlug: bucket.categorySlug,
+      categoryNameBn: bucket.categoryNameBn,
+      productCount: bucket.productCount,
+      availableCount: bucket.availableCount,
+      missingCount: bucket.productCount - bucket.availableCount,
+      averageMid:
+        bucket.mids.length > 0
+          ? roundPct(bucket.mids.reduce((total, value) => total + value, 0) / bucket.mids.length)
+          : null,
+    }));
+
+    const movers = await this.getMovers('day', 5, date);
+    const recentReports = await this.db
+      .select({ date: reports.date, revisionId: reports.currentRevisionId })
+      .from(reports)
+      .where(and(eq(reports.status, 'published'), sql`${reports.date} <= ${report.date}`))
+      .orderBy(desc(reports.date))
+      .limit(7);
+
+    recentReports.reverse();
+    const recentRevIds = recentReports.map((r) => r.revisionId).filter((id): id is number => id !== null);
+    const recentEntries =
+      recentRevIds.length > 0
+        ? await this.db
+            .select({ revisionId: priceEntries.revisionId, min: priceEntries.min, max: priceEntries.max })
+            .from(priceEntries)
+            .where(inArray(priceEntries.revisionId, recentRevIds))
+        : [];
+
+    const revMidMap = new Map<number, number[]>();
+    for (const entry of recentEntries) {
+      const value = mid(entry.min, entry.max);
+      if (value === null) continue;
+      const list = revMidMap.get(entry.revisionId) ?? [];
+      list.push(value);
+      revMidMap.set(entry.revisionId, list);
+    }
+
+    const historicalTrend = recentReports.map((r) => {
+      const mids = r.revisionId ? (revMidMap.get(r.revisionId) ?? []) : [];
+      return {
+        date: r.date,
+        averageMid: mids.length > 0 ? roundPct(mids.reduce((total, value) => total + value, 0) / mids.length) : null,
+        availableCount: mids.length,
+      };
+    });
+
+    const strongestCategory = [...categoryBreakdown]
+      .filter((cat) => cat.averageMid !== null)
+      .sort((a, b) => (b.averageMid ?? 0) - (a.averageMid ?? 0))[0];
+    const weakestDataCategory = [...categoryBreakdown].sort((a, b) => b.missingCount - a.missingCount)[0];
+    const trendStart = historicalTrend.find((point) => point.averageMid !== null);
+    const trendEnd = [...historicalTrend].reverse().find((point) => point.averageMid !== null);
+    const trendChange =
+      trendStart?.averageMid && trendEnd?.averageMid ? roundPct(trendEnd.averageMid - trendStart.averageMid) : null;
+
+    const marketMood =
+      summary.upCount > summary.downCount
+        ? 'আজ সামগ্রিকভাবে দাম বৃদ্ধির চাপ বেশি দেখা যাচ্ছে।'
+        : summary.downCount > summary.upCount
+          ? 'আজ সামগ্রিকভাবে কিছু পণ্যে দাম কমার প্রবণতা বেশি।'
+          : 'আজ দাম বৃদ্ধি ও হ্রাস প্রায় ভারসাম্যপূর্ণ।';
+
+    const keyFindingsBn = [
+      `আজ ${summary.totalTracked}টি পণ্যের মধ্যে ${summary.upCount}টির দাম বেড়েছে, ${summary.downCount}টির দাম কমেছে এবং ${summary.sameCount}টি অপরিবর্তিত।`,
+      `সামগ্রিক গড় পরিবর্তন ${summary.averageChangePct}%।`,
+      markets.length > 0
+        ? `এই বুলেটিনে ${markets.length}টি ঢাকা বাজারের তথ্য কভার করা হয়েছে।`
+        : 'এই বুলেটিনে বাজার তালিকা পাওয়া যায়নি।',
+      productsNeedingReview > 0
+        ? `${productsNeedingReview}টি নতুন/পরিবর্তিত পণ্য অ্যাডমিন রিভিউ প্রয়োজন।`
+        : 'নতুন পণ্য রিভিউ কিউ বর্তমানে খালি।',
+    ];
+
+    return {
+      reportDate: report.date,
+      titleBn: `${report.date} বাজার বিশ্লেষণ`,
+      executiveSummaryBn:
+        'এই প্রতিবেদনটি TCB বুলেটিন থেকে সংগৃহীত দৈনিক খুচরা বাজারদরের উপর ভিত্তি করে তৈরি। এটি অফিসিয়াল সরকারি মূল্যায়ন নয়; জনসাধারণের জন্য সহজবোধ্য মূল্য-তথ্য বিশ্লেষণ।',
+      keyFindingsBn,
+      marketCoverage: {
+        marketCount: markets.length,
+        productCount: rows.length,
+        markets,
+      },
+      movement: {
+        upCount: summary.upCount,
+        downCount: summary.downCount,
+        sameCount: summary.sameCount,
+        shareUp: summary.shareUp,
+        shareDown: summary.shareDown,
+        shareSame: summary.shareSame,
+        averageChangePct: summary.averageChangePct,
+      },
+      categoryBreakdown,
+      topMovers: {
+        risers: movers.risers,
+        fallers: movers.fallers,
+      },
+      historicalTrend,
+      analysisBn: {
+        marketMood,
+        strongestCategory: strongestCategory?.categoryNameBn ?? null,
+        weakestDataCategory: weakestDataCategory?.missingCount ? weakestDataCategory.categoryNameBn : null,
+        volatilityNote:
+          trendChange === null
+            ? 'ঐতিহাসিক প্রবণতা নির্ণয়ের জন্য পর্যাপ্ত ধারাবাহিক ডেটা নেই।'
+            : `শেষ ${historicalTrend.length}টি প্রকাশিত বুলেটিনে গড় মধ্যদাম ${trendChange >= 0 ? 'বেড়েছে' : 'কমেছে'} ${Math.abs(trendChange)} টাকা।`,
+      },
+      dataQuality: {
+        missingCurrentPrices,
+        productsNeedingReview,
+        sparseHistoryNoteBn:
+          'কম দিনের ডেটা থাকলে চার্ট ও শতাংশ পরিবর্তন সীমিত হতে পারে; ব্যবহারকারীর কাছে অনুপস্থিত ডেটা শূন্য হিসেবে দেখানো হয় না।',
+      },
     };
   }
 
