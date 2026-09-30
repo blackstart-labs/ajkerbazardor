@@ -22,31 +22,51 @@ const ALLOWED_ORIGINS = new Set([
 ]);
 
 function getCorsOrigin(origin: string | undefined): string {
-  if (!origin) return '';
+  if (!origin) return '*';
   const clean = origin.replace(/\/$/, '');
-  if (ALLOWED_ORIGINS.has(clean) || /^https:\/\/ajkerbazardoor?(-[a-z0-9-]+)?\.vercel\.app$/.test(clean)) {
+  if (
+    ALLOWED_ORIGINS.has(clean) ||
+    clean.includes('vercel.app') ||
+    clean.includes('localhost') ||
+    clean.includes('127.0.0.1')
+  ) {
     return clean;
   }
-  return '';
+  return clean;
 }
 
 export default async function handler(req: IncomingMessage, res: ServerResponse) {
-  const origin = getCorsOrigin(req.headers.origin);
+  const reqOrigin = req.headers.origin;
+  const origin = getCorsOrigin(reqOrigin);
 
-  // Set CORS headers immediately
-  if (origin) {
-    res.setHeader('Access-Control-Allow-Origin', origin);
-    res.setHeader('Access-Control-Allow-Credentials', 'true');
-    res.setHeader('Access-Control-Allow-Methods', 'GET,POST,PUT,PATCH,DELETE,OPTIONS');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type,Authorization,X-Requested-With');
-    res.setHeader('Access-Control-Max-Age', '86400');
-  }
+  // Set CORS headers immediately on every request
+  res.setHeader('Access-Control-Allow-Origin', origin);
+  res.setHeader('Access-Control-Allow-Credentials', 'true');
+  res.setHeader('Access-Control-Allow-Methods', 'GET,POST,PUT,PATCH,DELETE,OPTIONS');
+  res.setHeader(
+    'Access-Control-Allow-Headers',
+    'Content-Type,Authorization,X-Requested-With,Accept,Accept-Version,Content-Length,Content-MD5,Date,X-Api-Version,X-CSRF-Token',
+  );
+  res.setHeader('Access-Control-Max-Age', '86400');
 
-  // Preflight OPTIONS fast exit
+  // Preflight OPTIONS fast exit (returns HTTP 204 OK immediately)
   if (req.method === 'OPTIONS') {
     res.statusCode = 204;
     res.end();
     return;
+  }
+
+  // Restore original request URL if rewritten by Vercel catch-all or proxy
+  const rawUrl = req.url || '/';
+  const matchedPath = req.headers['x-matched-path'] as string | undefined;
+  const forwardedUri = req.headers['x-forwarded-uri'] as string | undefined;
+
+  if (rawUrl.includes('[...all]') || rawUrl === '/api' || rawUrl === '/api/index') {
+    if (matchedPath && !matchedPath.includes('[...all]')) {
+      req.url = matchedPath;
+    } else if (forwardedUri && !forwardedUri.includes('[...all]')) {
+      req.url = forwardedUri;
+    }
   }
 
   try {
