@@ -61,7 +61,7 @@ export function resolveProductImage(nameBn?: string | null, existingImage?: stri
   }
   if (!nameBn) return null;
 
-  // High-resolution unbranded product showcase images for commodities without single emoji icons
+  // High-resolution unbranded product showcase images
   if (nameBn.includes('আটা') || nameBn.includes('ময়দা')) return '/images/commodities/flour.jpg';
   if (nameBn.includes('ডাল') || nameBn.includes('ছোলা')) return '/images/commodities/lentils.jpg';
   if (nameBn.includes('তেল') || nameBn.includes('অয়েল') || nameBn.includes('অয়েল'))
@@ -82,6 +82,15 @@ export function resolveProductImage(nameBn?: string | null, existingImage?: stri
     return '/images/commodities/spices.jpg';
   }
   if (nameBn.includes('চাল')) return '/images/commodities/rice.jpg';
+  if (nameBn.includes('পিঁয়াজ') || nameBn.includes('পেঁয়াজ')) return '/images/commodities/onion.jpg';
+  if (nameBn.includes('আলু')) return '/images/commodities/potato.jpg';
+  if (nameBn.includes('রসুন') || nameBn.includes('আদা')) return '/images/commodities/garlic_ginger.jpg';
+  if (nameBn.includes('মরিচ')) return '/images/commodities/chillies.jpg';
+  if (nameBn.includes('হলুদ')) return '/images/commodities/turmeric.jpg';
+  if (nameBn.includes('বেগুন')) return '/images/commodities/eggplant.jpg';
+  if (nameBn.includes('শসা')) return '/images/commodities/cucumber.jpg';
+  if (nameBn.includes('লেবু')) return '/images/commodities/lemon.jpg';
+  if (nameBn.includes('ডিম')) return '/images/commodities/egg.jpg';
 
   return productArtDataUri(nameBn);
 }
