@@ -1,4 +1,4 @@
-/* ── Admin Global Styles ─────────────────────────────────────────────────── */
+/* ── Admin Global Styles — Warm Athenaeum / Peach Storefront Design System ── */
 
 /* Reset */
 *,
@@ -15,13 +15,91 @@ html {
   scroll-behavior: smooth;
 }
 
+/* ── Admin Design Tokens ─────────────────────────────────────────────────── */
+:root {
+  /* Warm Canvas & Surface Palette (matching screenshot) */
+  --color-bg-canvas: #faf6f0;
+  --color-bg-surface: #ffffff;
+  --color-bg-subtle: #f5ede4;
+  --color-bg-muted: #e9decf;
+
+  /* Typography Colors */
+  --color-text-primary: #1c1917;
+  --color-text-secondary: #4b5563;
+  --color-text-muted: #8b857f;
+  --color-text-inverse: #ffffff;
+
+  /* Vibrant Warm Coral & Accents (matching screenshot) */
+  --color-coral-primary: #ff6b4a;
+  --color-coral-dark: #f4442e;
+  --color-coral-subtle: #fff1ee;
+  --color-coral-border: #fecdc4;
+  --color-coral-gradient: linear-gradient(135deg, #ff7253 0%, #f4442e 100%);
+  --color-coral-glow: 0 8px 24px rgba(244, 68, 46, 0.28);
+
+  /* Secondary Accents */
+  --color-accent-amber: #f59e0b;
+  --color-accent-amber-subtle: #fef3c7;
+  --color-accent-green: #10b981;
+  --color-accent-green-subtle: #d1fae5;
+  --color-accent-cyan: #0ea5e9;
+  --color-accent-cyan-subtle: #e0f2fe;
+  --color-accent-purple: #8b5cf6;
+  --color-accent-purple-subtle: #ede9fe;
+
+  /* Directional Trends */
+  --color-trend-up: #ef4444;
+  --color-trend-up-bg: #fee2e2;
+  --color-trend-up-border: #fca5a5;
+
+  --color-trend-down: #10b981;
+  --color-trend-down-bg: #ecfdf5;
+  --color-trend-down-border: #a7f3d0;
+
+  --color-trend-same: #6b7280;
+  --color-trend-same-bg: #f3f4f6;
+  --color-trend-same-border: #e5e7eb;
+
+  /* Borders & Shadows */
+  --color-border-subtle: rgba(230, 222, 212, 0.85);
+  --color-border-strong: #ded4c5;
+  --card-radius: 22px;
+  --card-radius-sm: 14px;
+  --card-shadow: 0 4px 20px rgba(0, 0, 0, 0.03), 0 1px 3px rgba(0, 0, 0, 0.02);
+  --card-shadow-hover: 0 10px 28px rgba(0, 0, 0, 0.06), 0 2px 6px rgba(0, 0, 0, 0.03);
+
+  /* Typography Scale (Significantly increased for high legibility) */
+  --text-xs: 0.8125rem;   /* 13px */
+  --text-sm: 0.9375rem;   /* 15px */
+  --text-base: 1.0625rem; /* 17px */
+  --text-lg: 1.1875rem;   /* 19px */
+  --text-xl: 1.375rem;    /* 22px */
+  --text-2xl: 1.625rem;   /* 26px */
+  --text-3xl: 2.125rem;   /* 34px */
+  --text-4xl: 2.625rem;   /* 42px */
+
+  --leading-normal: 1.6;
+  --leading-tight: 1.25;
+
+  /* Layout */
+  --admin-sidebar-width: 250px;
+  --admin-header-height: 64px;
+  --admin-content-max: 1360px;
+
+  /* Animations */
+  --ease-spring: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
 body {
-  /* Admin uses Inter for Latin UI, Hind Siliguri for Bangla content */
   font-family: 'Inter', var(--font-body);
   background-color: var(--color-bg-canvas);
   color: var(--color-text-primary);
-  line-height: 1.5;
+  font-size: var(--text-sm);
+  line-height: var(--leading-normal);
   min-height: 100dvh;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 img,
@@ -40,7 +118,7 @@ select {
   font: inherit;
 }
 
-/* Scrollbar styling */
+/* Custom Smooth Scrollbar */
 * {
   scrollbar-width: thin;
   scrollbar-color: var(--color-border-strong) transparent;
@@ -55,17 +133,10 @@ select {
 }
 *::-webkit-scrollbar-thumb {
   background-color: var(--color-border-strong);
-  border-radius: 3px;
+  border-radius: 4px;
 }
 
-/* ── Admin Layout Tokens ─────────────────────────────────────────────────── */
-:root {
-  --admin-sidebar-width: 240px;
-  --admin-header-height: 56px;
-  --admin-content-max: 1100px;
-}
-
-/* ── Accessible SR-only ──────────────────────────────────────────────────── */
+/* Accessible SR-only */
 .sr-only {
   position: absolute;
   width: 1px;
@@ -78,12 +149,12 @@ select {
   border-width: 0;
 }
 
-/* ── Utility classes ─────────────────────────────────────────────────────── */
+/* Typography & Utility classes */
 .text-muted {
   color: var(--color-text-muted);
 }
 .text-brand {
-  color: var(--color-brand-primary);
+  color: var(--color-coral-primary);
 }
 .text-up {
   color: var(--color-trend-up);
@@ -99,11 +170,47 @@ select {
   font-family: var(--font-heading);
 }
 
-/* Admin Link */
+/* Tabular figures for aligned prices and counts */
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Links */
 a {
-  color: var(--color-brand-primary);
+  color: var(--color-coral-primary);
   text-decoration: none;
+  transition: color 150ms var(--ease-smooth);
 }
 a:hover {
+  color: var(--color-coral-dark);
   text-decoration: underline;
+}
+
+/* Floating Jump-to-Top Button */
+.jump-to-top {
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: var(--color-bg-surface);
+  border: 1.5px solid var(--color-border-subtle);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+  color: var(--color-coral-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 90;
+  transition: transform 0.2s var(--ease-spring), box-shadow 0.2s var(--ease-smooth), background-color 0.2s;
+}
+.jump-to-top:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 24px rgba(244, 68, 46, 0.25);
+  border-color: var(--color-coral-primary);
+  background: var(--color-coral-subtle);
+}
+.jump-to-top:active {
+  transform: translateY(0);
 }
