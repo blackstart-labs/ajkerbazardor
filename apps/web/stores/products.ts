@@ -1,6 +1,5 @@
 // Pinia store for products listing, filtering, and single product PDP
 import { defineStore } from 'pinia';
-import { productArtDataUri } from '~/utils/product-art';
 
 export interface ProductCard {
   id: number;
@@ -91,8 +90,28 @@ export function resolveProductImage(nameBn?: string | null, existingImage?: stri
   if (nameBn.includes('শসা')) return '/images/commodities/cucumber.jpg';
   if (nameBn.includes('লেবু')) return '/images/commodities/lemon.jpg';
   if (nameBn.includes('ডিম')) return '/images/commodities/egg.jpg';
+  if (nameBn.includes('রুই') || nameBn.includes('ইলিশ') || nameBn.includes('মাছ'))
+    return '/images/commodities/fish.jpg';
+  if (
+    nameBn.includes('গরু') ||
+    nameBn.includes('খাসী') ||
+    nameBn.includes('মুরগী') ||
+    nameBn.includes('মাংস') ||
+    nameBn.includes('গোশত')
+  ) {
+    return '/images/commodities/meat.jpg';
+  }
+  if (
+    nameBn.includes('দুধ') ||
+    nameBn.includes('ডানো') ||
+    nameBn.includes('ডিপ্লোমা') ||
+    nameBn.includes('ফ্রেশ') ||
+    nameBn.includes('মার্কস')
+  ) {
+    return '/images/commodities/milk.jpg';
+  }
 
-  return productArtDataUri(nameBn);
+  return '/images/commodities/rice.jpg';
 }
 
 export const useProductsStore = defineStore('products', {

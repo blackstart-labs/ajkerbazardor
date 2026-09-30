@@ -1,11 +1,10 @@
 // Typed API client for the admin SPA
 import { ofetch, type FetchOptions } from 'ofetch';
-import { DEFAULT_PUBLIC_API_BASE } from '@ajkerbazardor/shared';
 
 const defaultBase =
   typeof window !== 'undefined' && window.location.hostname === 'localhost'
     ? 'http://localhost:3000/api/v1'
-    : DEFAULT_PUBLIC_API_BASE;
+    : 'https://api-tawny-pi-32.vercel.app/api/v1';
 
 const BASE = import.meta.env['VITE_API_BASE'] || defaultBase;
 
