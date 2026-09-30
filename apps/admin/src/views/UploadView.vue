@@ -32,8 +32,31 @@ onMounted(async () => {
 async function loadRevisions() {
   revsLoading.value = true;
   try {
-    const res = await apiGet<{ ok: boolean; data: Revision[] }>('/admin/imports?limit=20');
-    revisions.value = res.data ?? [];
+    const res = await apiGet<{ ok: boolean; data: any[] }>('/admin/imports?limit=20');
+    const raw = Array.isArray(res.data) ? res.data : [];
+    revisions.value = raw.map((r: any) => {
+      let statsObj: any = {};
+      try {
+        statsObj = typeof r.stats === 'string' ? JSON.parse(r.stats) : (r.stats ?? {});
+      } catch {
+        statsObj = {};
+      }
+      let warnArr: any = [];
+      try {
+        warnArr = typeof r.warnings === 'string' ? JSON.parse(r.warnings) : (r.warnings ?? []);
+      } catch {
+        warnArr = [];
+      }
+      return {
+        id: r.id,
+        reportId: r.reportId,
+        date: r.date ?? r.reportDate ?? '',
+        productCount: statsObj.productCount ?? statsObj.parsed ?? r.productCount ?? 0,
+        warnings: Array.isArray(warnArr) ? warnArr.length : typeof warnArr === 'number' ? warnArr : 0,
+        uploadedBy: r.uploadedBy ?? 'Admin',
+        createdAt: r.createdAt ?? '',
+      };
+    });
   } catch {
     // non-fatal
   } finally {

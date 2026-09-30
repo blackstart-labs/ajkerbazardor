@@ -5,6 +5,7 @@
 <template>
   <div class="app-shell">
     <NuxtPage />
+    <JumpToTop />
   </div>
 </template>
 

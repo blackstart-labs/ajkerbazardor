@@ -56,27 +56,33 @@ export interface HistoryPoint {
 export type SortKey = 'price_asc' | 'price_desc' | 'change_asc' | 'change_desc' | 'name' | 'sort_order';
 
 export function resolveProductImage(nameBn?: string | null, existingImage?: string | null): string | null {
-  if (existingImage && existingImage.trim().length > 0) {
+  if (existingImage && existingImage.trim().length > 0 && !existingImage.includes('/images/products/')) {
     return existingImage;
   }
   if (!nameBn) return null;
-  if (nameBn.includes('চাল') && nameBn.includes('সুগন্ধী'))
-    return encodeURI('/images/products/চাল সুগন্ধী (পোলাও).webp');
-  if (nameBn.includes('আটা') && nameBn.includes('খোলা')) return encodeURI('/images/products/আটা সাদা (খোলা).webp');
-  if (nameBn.includes('আটা') && nameBn.includes('প্যাকেট')) return encodeURI('/images/products/আটা (প্যাকেট).jpeg');
-  if (nameBn.includes('ময়দা') && nameBn.includes('খোলা')) return encodeURI('/images/products/ময়দা (খোলা).jpeg');
-  if (nameBn.includes('ময়দা') && nameBn.includes('প্যাকেট')) return encodeURI('/images/products/ময়দা (প্যাকেট).jpeg');
-  if (nameBn.includes('সয়াবিন')) return encodeURI('/images/products/সয়াবিন তেল.webp');
-  if (nameBn.includes('পাম অয়েল')) return encodeURI('/images/products/পাম অয়েল.webp');
-  if (nameBn.includes('খেজুর')) return encodeURI('/images/products/খেজুর.jpg');
-  if (nameBn.includes('লবণ')) return encodeURI('/images/products/লবণ.jpg');
-  if (nameBn.includes('লেবু')) return encodeURI('/images/products/লেবু.jpeg');
-  if (nameBn.includes('কাঁচামরিচ')) return encodeURI('/images/products/কাঁচামরিচ.jpg');
-  if (nameBn.includes('বেগুন')) return encodeURI('/images/products/বেগুন.jpeg');
-  if (nameBn.includes('শসা')) return encodeURI('/images/products/শসা.jpg');
-  if (nameBn.includes('ডিম')) return encodeURI('/images/products/ডিম (ফার্ম).jpg');
-  if (nameBn.includes('কাগজ')) return encodeURI('/images/products/লেখার কাগজ.jpeg');
-  if (nameBn.includes('রড')) return encodeURI('/images/products/এম,এস রড.jpg');
+
+  // High-resolution unbranded product showcase images for commodities without single emoji icons
+  if (nameBn.includes('আটা') || nameBn.includes('ময়দা')) return '/images/commodities/flour.jpg';
+  if (nameBn.includes('ডাল') || nameBn.includes('ছোলা')) return '/images/commodities/lentils.jpg';
+  if (nameBn.includes('তেল') || nameBn.includes('অয়েল') || nameBn.includes('অয়েল'))
+    return '/images/commodities/oil.jpg';
+  if (nameBn.includes('চিনি')) return '/images/commodities/sugar.jpg';
+  if (nameBn.includes('লবণ')) return '/images/commodities/salt.jpg';
+  if (nameBn.includes('খেজুর')) return '/images/commodities/dates.jpg';
+  if (nameBn.includes('রড')) return '/images/commodities/rebar.jpg';
+  if (nameBn.includes('কাগজ')) return '/images/commodities/paper.jpg';
+  if (
+    nameBn.includes('জিরা') ||
+    nameBn.includes('দারুচিনি') ||
+    nameBn.includes('লবঙ্গ') ||
+    nameBn.includes('এলাচ') ||
+    nameBn.includes('ধনে') ||
+    nameBn.includes('তেজপাতা')
+  ) {
+    return '/images/commodities/spices.jpg';
+  }
+  if (nameBn.includes('চাল')) return '/images/commodities/rice.jpg';
+
   return productArtDataUri(nameBn);
 }
 

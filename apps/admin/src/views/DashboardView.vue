@@ -78,12 +78,20 @@ onMounted(async () => {
   try {
     const revRes = await apiGet<{ ok: boolean; data: any[] }>('/admin/imports?limit=5');
     const rawRevs = Array.isArray(revRes?.data) ? revRes.data : [];
-    revisions.value = rawRevs.map((r: any) => ({
-      id: r.id,
-      date: r.reportDate ?? r.date ?? '',
-      productCount: r.stats?.parsed ?? r.stats?.matched ?? r.productCount ?? 0,
-      createdAt: r.createdAt ?? '',
-    }));
+    revisions.value = rawRevs.map((r: any) => {
+      let statsObj: any = {};
+      try {
+        statsObj = typeof r.stats === 'string' ? JSON.parse(r.stats) : (r.stats ?? {});
+      } catch {
+        statsObj = {};
+      }
+      return {
+        id: r.id,
+        date: r.reportDate ?? r.date ?? '',
+        productCount: statsObj.productCount ?? statsObj.parsed ?? r.productCount ?? 0,
+        createdAt: r.createdAt ?? '',
+      };
+    });
   } catch (err) {
     console.error('Failed to load revisions:', err);
   }
