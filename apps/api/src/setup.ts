@@ -20,7 +20,12 @@ function allowedOrigins() {
     ? process.env['CORS_ORIGIN'].split(',').map((s) => s.trim().replace(/\/$/, ''))
     : defaultOrigins;
 
-  return new Set(rawOrigins.filter(Boolean));
+  const set = new Set(rawOrigins.filter(Boolean));
+  set.add('https://ajkerbazardor.vercel.app');
+  set.add('https://ajkerbazardoor.vercel.app');
+  set.add('http://localhost:3001');
+  set.add('http://localhost:3002');
+  return set;
 }
 
 export async function createNestApp(): Promise<NestFastifyApplication> {
@@ -42,7 +47,10 @@ export async function createNestApp(): Promise<NestFastifyApplication> {
     origin: (origin, callback) => {
       if (!origin) return callback(null, true);
       const cleanOrigin = origin.replace(/\/$/, '');
-      return callback(null, origins.has(cleanOrigin));
+      if (origins.has(cleanOrigin) || /^https:\/\/ajkerbazardoor?(-[a-z0-9-]+)?\.vercel\.app$/.test(cleanOrigin)) {
+        return callback(null, cleanOrigin);
+      }
+      return callback(null, false);
     },
     credentials: true,
   });
