@@ -21,62 +21,93 @@ async function handleLogin() {
 
 <template>
   <div class="login-page">
-    <!-- Background decorative blobs -->
+    <!-- Background decorative warm ambient circles -->
     <div class="login-page__bg" aria-hidden="true">
       <div class="login-page__blob login-page__blob--1" />
       <div class="login-page__blob login-page__blob--2" />
     </div>
 
     <main class="login-card" aria-labelledby="login-heading">
-      <!-- Brand -->
+      <!-- Brand & Badge -->
       <div class="login-card__brand">
-        <span class="login-card__logo" aria-hidden="true">🛒</span>
+        <div class="brand-badge-wrap">
+          <div class="brand-icon-pill">
+            <span class="brand-emoji">🛒</span>
+          </div>
+        </div>
+        <span class="portal-badge">অ্যাডমিন ম্যানেজমেন্ট পোর্টাল</span>
         <h1 id="login-heading" class="login-card__title">আজকের বাজার দর</h1>
-        <p class="login-card__subtitle">অ্যাডমিন প্যানেল</p>
+        <p class="login-card__subtitle">টিসিবি বাজারদর মনিটরিং ও কন্ট্রোল প্যানেলে প্রবেশ করুন</p>
       </div>
 
       <!-- Error Banner -->
       <div v-if="auth.error" class="login-card__error" role="alert" aria-live="polite">
         <svg
-          width="16"
-          height="16"
+          width="18"
+          height="18"
           viewBox="0 0 24 24"
           fill="none"
           stroke="currentColor"
-          stroke-width="2"
+          stroke-width="2.2"
           aria-hidden="true"
         >
           <circle cx="12" cy="12" r="10" />
           <line x1="12" y1="8" x2="12" y2="12" />
           <line x1="12" y1="16" x2="12.01" y2="16" />
         </svg>
-        {{ auth.error }}
+        <span>{{ auth.error }}</span>
       </div>
 
       <!-- Login Form -->
       <form class="login-form" novalidate @submit.prevent="handleLogin">
         <div class="login-form__field">
-          <label for="login-email" class="login-form__label">ইমেইল</label>
-          <input
-            id="login-email"
-            v-model="form.email"
-            type="email"
-            class="login-form__input"
-            placeholder="admin@example.com"
-            autocomplete="email"
-            required
-            :disabled="auth.loggingIn"
-          />
+          <label for="login-email" class="login-form__label">অ্যাডমিন ইমেইল</label>
+          <div class="input-wrap">
+            <svg
+              class="field-icon"
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
+              <polyline points="22,6 12,13 2,6" />
+            </svg>
+            <input
+              id="login-email"
+              v-model="form.email"
+              type="email"
+              class="login-form__input"
+              placeholder="admin@example.com"
+              autocomplete="email"
+              required
+              :disabled="auth.loggingIn"
+            />
+          </div>
         </div>
 
         <div class="login-form__field">
           <label for="login-password" class="login-form__label">পাসওয়ার্ড</label>
-          <div class="login-form__input-wrap">
+          <div class="input-wrap">
+            <svg
+              class="field-icon"
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+              <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+            </svg>
             <input
               id="login-password"
               v-model="form.password"
               :type="showPassword ? 'text' : 'password'"
-              class="login-form__input"
+              class="login-form__input has-eye-btn"
               placeholder="••••••••"
               autocomplete="current-password"
               required
@@ -90,8 +121,8 @@ async function handleLogin() {
             >
               <svg
                 v-if="!showPassword"
-                width="16"
-                height="16"
+                width="18"
+                height="18"
                 viewBox="0 0 24 24"
                 fill="none"
                 stroke="currentColor"
@@ -103,8 +134,8 @@ async function handleLogin() {
               </svg>
               <svg
                 v-else
-                width="16"
-                height="16"
+                width="18"
+                height="18"
                 viewBox="0 0 24 24"
                 fill="none"
                 stroke="currentColor"
@@ -122,11 +153,14 @@ async function handleLogin() {
 
         <button type="submit" class="login-form__submit" :disabled="auth.loggingIn" :aria-busy="auth.loggingIn">
           <span v-if="auth.loggingIn" class="login-form__spinner" aria-hidden="true" />
-          {{ auth.loggingIn ? 'লগইন হচ্ছে…' : 'লগইন করুন' }}
+          <span>{{ auth.loggingIn ? 'লগইন যাচাই হচ্ছে…' : 'লগইন করুন' }}</span>
         </button>
       </form>
 
-      <p class="login-card__note">অ্যাডমিন অ্যাকাউন্ট প্রয়োজন</p>
+      <div class="login-card__footer">
+        <span class="secure-dot" />
+        <p class="login-card__note">নিরাপদ প্রশাসনিক অ্যাক্সেস ও প্রমাণীকরণ ব্যবস্থা</p>
+      </div>
     </main>
   </div>
 </template>
@@ -138,12 +172,12 @@ async function handleLogin() {
   align-items: center;
   justify-content: center;
   background-color: var(--color-bg-canvas);
-  padding: var(--space-4);
+  padding: 1.5rem;
   position: relative;
   overflow: hidden;
 }
 
-/* Decorative blobs */
+/* Decorative ambient blobs */
 .login-page__bg {
   position: absolute;
   inset: 0;
@@ -153,118 +187,179 @@ async function handleLogin() {
 .login-page__blob {
   position: absolute;
   border-radius: 50%;
-  filter: blur(80px);
-  opacity: 0.15;
+  filter: blur(100px);
+  opacity: 0.18;
 }
 
 .login-page__blob--1 {
-  width: 400px;
-  height: 400px;
-  background: var(--color-brand-primary);
-  top: -100px;
+  width: 450px;
+  height: 450px;
+  background: var(--color-coral-primary);
+  top: -120px;
   right: -100px;
 }
 
 .login-page__blob--2 {
-  width: 300px;
-  height: 300px;
-  background: var(--color-trend-down);
-  bottom: -80px;
+  width: 400px;
+  height: 400px;
+  background: var(--color-accent-green);
+  bottom: -100px;
   left: -80px;
 }
 
 /* ── Card ─────────────────────────────────────────────────────────────────── */
 .login-card {
   width: 100%;
-  max-width: 400px;
+  max-width: 440px;
   background-color: var(--color-bg-surface);
   border: 1px solid var(--color-border-subtle);
-  border-radius: var(--radius-xl);
-  box-shadow: var(--shadow-dropdown);
-  padding: var(--space-8);
+  border-radius: 28px;
+  box-shadow:
+    0 10px 40px rgba(0, 0, 0, 0.05),
+    0 2px 8px rgba(0, 0, 0, 0.02);
+  padding: 2.75rem 2.25rem;
   position: relative;
   z-index: 1;
+  animation: cardFadeIn 0.3s ease-out;
+}
+
+@keyframes cardFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }
 
 .login-card__brand {
   text-align: center;
-  margin-bottom: var(--space-6);
+  margin-bottom: 2rem;
 }
 
-.login-card__logo {
-  font-size: 2.5rem;
-  display: block;
-  margin-bottom: var(--space-2);
+.brand-badge-wrap {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 1rem;
+}
+
+.brand-icon-pill {
+  width: 58px;
+  height: 58px;
+  border-radius: 18px;
+  background: var(--color-coral-subtle);
+  border: 1.5px solid var(--color-coral-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 16px rgba(255, 107, 74, 0.12);
+}
+
+.brand-emoji {
+  font-size: 1.85rem;
+}
+
+.portal-badge {
+  display: inline-block;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  color: var(--color-coral-primary);
+  background: var(--color-coral-subtle);
+  border: 1px solid var(--color-coral-border);
+  padding: 0.25rem 0.85rem;
+  border-radius: 9999px;
+  margin-bottom: 0.65rem;
 }
 
 .login-card__title {
   font-family: var(--font-heading);
-  font-size: var(--text-2xl);
-  font-weight: 700;
+  font-size: 1.875rem;
+  font-weight: 800;
   color: var(--color-text-primary);
-  margin-bottom: var(--space-1);
+  margin-bottom: 0.4rem;
+  letter-spacing: -0.01em;
 }
 
 .login-card__subtitle {
-  font-family: var(--font-body);
   font-size: var(--text-sm);
-  color: var(--color-text-muted);
+  color: var(--color-text-secondary);
+  line-height: 1.5;
 }
 
 /* ── Error ────────────────────────────────────────────────────────────────── */
 .login-card__error {
   display: flex;
   align-items: center;
-  gap: var(--space-2);
+  gap: 0.65rem;
   background-color: var(--color-trend-up-bg);
-  color: var(--color-trend-up-text);
+  color: var(--color-trend-up);
   border: 1px solid var(--color-trend-up-border);
-  border-radius: var(--radius-md);
-  padding: var(--space-2-5) var(--space-3);
-  font-family: var(--font-body);
+  border-radius: 14px;
+  padding: 0.85rem 1rem;
   font-size: var(--text-sm);
-  margin-bottom: var(--space-4);
+  font-weight: 600;
+  margin-bottom: 1.5rem;
+}
+
+.login-card__error svg {
+  flex-shrink: 0;
 }
 
 /* ── Form ─────────────────────────────────────────────────────────────────── */
 .login-form {
   display: flex;
   flex-direction: column;
-  gap: var(--space-4);
+  gap: 1.25rem;
 }
 
 .login-form__field {
   display: flex;
   flex-direction: column;
-  gap: var(--space-1-5);
+  gap: 0.45rem;
 }
 
 .login-form__label {
-  font-family: var(--font-body);
   font-size: var(--text-sm);
-  font-weight: 600;
-  color: var(--color-text-secondary);
+  font-weight: 700;
+  color: var(--color-text-primary);
+}
+
+.input-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.field-icon {
+  position: absolute;
+  left: 1.15rem;
+  color: var(--color-text-muted);
+  pointer-events: none;
 }
 
 .login-form__input {
   width: 100%;
-  height: 44px;
-  padding: 0 var(--space-3);
-  border-radius: var(--radius-md);
+  height: 50px;
+  padding-left: 2.85rem;
+  padding-right: 1.25rem;
+  border-radius: 9999px;
   border: 1.5px solid var(--color-border-strong);
-  background-color: var(--color-bg-canvas);
+  background-color: var(--color-bg-surface);
   color: var(--color-text-primary);
-  font-family: var(--font-body);
   font-size: var(--text-base);
   outline: none;
-  transition:
-    border-color var(--duration-fast),
-    box-shadow var(--duration-fast);
+  transition: all 0.2s ease;
+}
+
+.login-form__input.has-eye-btn {
+  padding-right: 3.25rem;
 }
 
 .login-form__input:focus {
-  border-color: var(--color-brand-primary);
-  box-shadow: 0 0 0 3px var(--color-brand-subtle);
+  border-color: var(--color-coral-primary);
+  box-shadow: 0 0 0 3px rgba(255, 107, 74, 0.18);
 }
 
 .login-form__input:disabled {
@@ -272,55 +367,46 @@ async function handleLogin() {
   cursor: not-allowed;
 }
 
-.login-form__input-wrap {
-  position: relative;
-}
-
-.login-form__input-wrap .login-form__input {
-  padding-right: 44px;
-}
-
 .login-form__eye-btn {
   position: absolute;
-  right: var(--space-2-5);
+  right: 1rem;
   top: 50%;
   transform: translateY(-50%);
   background: transparent;
   border: none;
   color: var(--color-text-muted);
   cursor: pointer;
-  padding: var(--space-1);
+  padding: 0.35rem;
   display: flex;
   align-items: center;
-  transition: color var(--duration-fast);
+  transition: color 0.15s ease;
 }
 
 .login-form__eye-btn:hover {
-  color: var(--color-brand-primary);
+  color: var(--color-coral-primary);
 }
 
 .login-form__submit {
-  height: 48px;
-  border-radius: var(--radius-md);
-  background-color: var(--color-brand-primary);
+  height: 52px;
+  border-radius: 9999px;
+  background: var(--color-coral-gradient);
   color: #fff;
-  font-family: var(--font-body);
   font-size: var(--text-base);
-  font-weight: 700;
+  font-weight: 800;
   border: none;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: var(--space-2);
-  transition:
-    background-color var(--duration-fast),
-    opacity var(--duration-fast);
-  margin-top: var(--space-2);
+  gap: 0.65rem;
+  box-shadow: var(--color-coral-glow);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  margin-top: 0.75rem;
 }
 
 .login-form__submit:hover:not(:disabled) {
-  background-color: var(--color-brand-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 10px 28px rgba(244, 68, 46, 0.38);
 }
 
 .login-form__submit:disabled {
@@ -329,9 +415,9 @@ async function handleLogin() {
 }
 
 .login-form__spinner {
-  width: 18px;
-  height: 18px;
-  border: 2.5px solid rgba(255, 255, 255, 0.3);
+  width: 20px;
+  height: 20px;
+  border: 2.5px solid rgba(255, 255, 255, 0.35);
   border-top-color: #fff;
   border-radius: 50%;
   animation: spin 0.7s linear infinite;
@@ -343,11 +429,25 @@ async function handleLogin() {
   }
 }
 
+.login-card__footer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: 1.75rem;
+}
+
+.secure-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--color-accent-green);
+  box-shadow: 0 0 0 3px var(--color-accent-green-subtle);
+}
+
 .login-card__note {
-  text-align: center;
-  font-family: var(--font-body);
-  font-size: var(--text-xs);
+  font-size: 0.8125rem;
+  font-weight: 600;
   color: var(--color-text-muted);
-  margin-top: var(--space-4);
 }
 </style>
