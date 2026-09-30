@@ -28,6 +28,7 @@ export interface ImportResult {
   newProductCount: number;
   warnings: schema.Revision['warnings'];
   status: 'published';
+  duplicate: boolean;
 }
 
 @Injectable()
@@ -71,6 +72,41 @@ export class ImportService {
     userId: number,
   ): Promise<ImportResult> {
     const sha256 = crypto.createHash('sha256').update(buffer).digest('hex');
+
+    const [duplicateRevision] = await this.db
+      .select({
+        revisionId: revisions.id,
+        reportId: revisions.reportId,
+        stats: revisions.stats,
+        warnings: revisions.warnings,
+        date: reports.date,
+        serialNo: reports.serialNo,
+      })
+      .from(revisions)
+      .innerJoin(reports, eq(revisions.reportId, reports.id))
+      .where(eq(revisions.sha256, sha256))
+      .limit(1);
+
+    if (duplicateRevision) {
+      let stats: { productCount?: number } = {};
+      try {
+        stats = duplicateRevision.stats ? JSON.parse(duplicateRevision.stats) : {};
+      } catch {
+        stats = {};
+      }
+
+      return {
+        reportId: duplicateRevision.reportId,
+        revisionId: duplicateRevision.revisionId,
+        date: duplicateRevision.date,
+        serialNo: duplicateRevision.serialNo,
+        productCount: stats.productCount ?? parsed.products.length,
+        newProductCount: 0,
+        warnings: duplicateRevision.warnings,
+        status: 'published',
+        duplicate: true,
+      };
+    }
 
     // 1. Preload reference tables
     const allCategories = await this.db.select().from(categories);
@@ -282,6 +318,7 @@ export class ImportService {
       newProductCount,
       warnings: JSON.stringify(parsed.warnings),
       status: 'published',
+      duplicate: false,
     };
   }
 

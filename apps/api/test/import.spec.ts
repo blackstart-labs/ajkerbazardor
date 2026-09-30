@@ -149,9 +149,19 @@ describe('TCB Parser & Import Pipeline', () => {
       expect(totalProds.length).toBe(60);
     });
 
+    it('treats re-uploading the same file as an idempotent no-op', async () => {
+      const buf = fs.readFileSync(file23);
+      const first = await importService.importTcbFile(buf, 'tcb-2026-09-23.xlsx', 1);
+      const second = await importService.importTcbFile(buf, 'tcb-2026-09-23-copy.xlsx', 1);
+
+      expect(second.duplicate).toBe(true);
+      expect(second.revisionId).toBe(first.revisionId);
+      expect(second.reportId).toBe(first.reportId);
+    });
+
     it('supports undoing revisions for a report', async () => {
       // Re-import day 23 with a second revision
-      const buf = fs.readFileSync(file23);
+      const buf = Buffer.concat([fs.readFileSync(file23), Buffer.from('metadata-change-for-test')]);
       const secondImport = await importService.importTcbFile(buf, 'tcb-2026-09-23-v2.xlsx', 1);
 
       const repBefore = await db.select().from(schema.reports).where(eq(schema.reports.date, '2026-09-23'));

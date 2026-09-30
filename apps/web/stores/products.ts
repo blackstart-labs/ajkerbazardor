@@ -1,5 +1,6 @@
 // Pinia store for products listing, filtering, and single product PDP
 import { defineStore } from 'pinia';
+import { productArtDataUri } from '~/utils/product-art';
 
 export interface ProductCard {
   id: number;
@@ -76,7 +77,7 @@ export function resolveProductImage(nameBn?: string | null, existingImage?: stri
   if (nameBn.includes('ডিম')) return encodeURI('/images/products/ডিম (ফার্ম).jpg');
   if (nameBn.includes('কাগজ')) return encodeURI('/images/products/লেখার কাগজ.jpeg');
   if (nameBn.includes('রড')) return encodeURI('/images/products/এম,এস রড.jpg');
-  return null;
+  return productArtDataUri(nameBn);
 }
 
 export const useProductsStore = defineStore('products', {

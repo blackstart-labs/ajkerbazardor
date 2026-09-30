@@ -2,6 +2,7 @@ import { Injectable, Inject, NotFoundException, BadRequestException } from '@nes
 import { eq, and, isNull, like, sql, desc, count } from 'drizzle-orm';
 import type { LibSQLDatabase } from 'drizzle-orm/libsql';
 import { normaliseName } from '@ajkerbazardor/shared';
+import { z } from 'zod';
 import { DRIZZLE } from '../drizzle/drizzle.module.js';
 import * as schema from '../drizzle/schema.js';
 
@@ -42,6 +43,35 @@ export interface ApproveProductDto {
   categoryId?: number | undefined;
   unitId?: number | undefined;
   nameBn?: string | undefined;
+}
+
+const createProductSchema = z.object({
+  nameBn: z.string().trim().min(1),
+  slug: z.string().trim().min(1).optional(),
+  categoryId: z.coerce.number().int().positive(),
+  unitId: z.coerce.number().int().positive(),
+  image: z.string().trim().min(1).nullable().optional(),
+  aliases: z.array(z.string().trim().min(1)).optional(),
+  sortOrder: z.coerce.number().int().min(0).optional(),
+  needsReview: z.boolean().optional(),
+});
+
+const updateProductSchema = createProductSchema.partial().refine((dto) => Object.keys(dto).length > 0, {
+  message: 'At least one product field must be provided',
+});
+
+const approveProductSchema = z.object({
+  categoryId: z.coerce.number().int().positive().optional(),
+  unitId: z.coerce.number().int().positive().optional(),
+  nameBn: z.string().trim().min(1).optional(),
+});
+
+function parseAdminDto<T>(schema: z.ZodType<T>, value: unknown): T {
+  const result = schema.safeParse(value);
+  if (!result.success) {
+    throw new BadRequestException(result.error.issues.map((issue) => issue.message).join('; '));
+  }
+  return result.data;
 }
 
 @Injectable()
@@ -152,6 +182,7 @@ export class ProductsService {
   }
 
   async create(dto: CreateProductDto, userId?: number) {
+    dto = parseAdminDto(createProductSchema, dto);
     const nameKey = normaliseName(dto.nameBn);
 
     // Verify unit exists
@@ -216,6 +247,7 @@ export class ProductsService {
   }
 
   async update(id: number, dto: UpdateProductDto, userId?: number) {
+    dto = parseAdminDto(updateProductSchema, dto);
     const existing = await this.findById(id);
 
     const valuesToUpdate: Record<string, unknown> = {};
@@ -353,6 +385,7 @@ export class ProductsService {
   }
 
   async approve(id: number, dto: ApproveProductDto, userId?: number) {
+    dto = parseAdminDto(approveProductSchema, dto);
     await this.findById(id);
 
     const updatePayload: UpdateProductDto = {

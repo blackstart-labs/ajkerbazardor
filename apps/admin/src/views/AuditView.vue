@@ -6,10 +6,12 @@ import { formatBnDate } from '@ajkerbazardor/shared';
 interface AuditEntry {
   id: number;
   action: string;
-  entityType: string;
+  entityType?: string;
+  entity?: string;
   entityId: number | null;
   changes: unknown;
-  createdAt: string;
+  createdAt?: string;
+  at?: string;
   performedBy: string | null;
 }
 
@@ -70,11 +72,11 @@ function actionClass(action: string) {
             </tr>
           </template>
           <tr v-for="e in entries" :key="e.id">
-            <td class="text-muted text-sm">{{ new Date(e.createdAt).toLocaleString('bn-BD') }}</td>
+            <td class="text-muted text-sm">{{ new Date(e.createdAt ?? e.at ?? '').toLocaleString('bn-BD') }}</td>
             <td>
               <span :class="actionClass(e.action)">{{ e.action }}</span>
             </td>
-            <td class="text-muted">{{ e.entityType }}</td>
+            <td class="text-muted">{{ e.entityType ?? e.entity }}</td>
             <td class="text-muted">{{ e.entityId ?? '—' }}</td>
             <td class="text-muted">{{ e.performedBy ?? '—' }}</td>
           </tr>

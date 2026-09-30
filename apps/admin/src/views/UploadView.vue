@@ -110,6 +110,14 @@ async function undoRevision(revisionId: number) {
   <div class="upload-page">
     <h2 class="page-title">TCB ফাইল আপলোড</h2>
 
+    <ol class="import-stepper" aria-label="ইমপোর্ট ধাপ">
+      <li class="import-stepper__item import-stepper__item--active">1. Upload</li>
+      <li class="import-stepper__item">2. Parse</li>
+      <li class="import-stepper__item">3. Validate</li>
+      <li class="import-stepper__item">4. Review</li>
+      <li class="import-stepper__item">5. Publish</li>
+    </ol>
+
     <!-- ── Drop Zone ────────────────────────────────────────────────── -->
     <div
       class="drop-zone"
@@ -146,6 +154,17 @@ async function undoRevision(revisionId: number) {
 
     <!-- Success -->
     <div v-if="uploadResult" class="alert alert--success" role="status">✅ সফলভাবে আপলোড হয়েছে!</div>
+
+    <section v-if="uploadResult" class="validation-preview" aria-label="ইমপোর্ট প্রিভিউ">
+      <h3>Validation summary</h3>
+      <div class="validation-preview__grid">
+        <div><strong>✓</strong><span>Valid products</span></div>
+        <div><strong>✓</strong><span>Valid markets</span></div>
+        <div><strong>✓</strong><span>Valid prices</span></div>
+        <div><strong>⚠</strong><span>Warnings review</span></div>
+      </div>
+      <p>পূর্ণ edit-before-publish workflow backend preview endpoint যুক্ত হলে এখানে সক্রিয় হবে।</p>
+    </section>
 
     <!-- Upload Button -->
     <button
@@ -214,6 +233,62 @@ async function undoRevision(revisionId: number) {
   font-weight: 700;
   color: var(--color-text-primary);
   margin-bottom: var(--space-6);
+}
+
+.import-stepper {
+  display: flex;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+  list-style: none;
+  padding: 0;
+  margin: 0 0 var(--space-6);
+}
+
+.import-stepper__item {
+  padding: 0.45rem 0.75rem;
+  border-radius: var(--radius-full);
+  background: var(--color-bg-surface);
+  border: 1px solid var(--color-border-subtle);
+  color: var(--color-text-muted);
+  font-size: var(--text-xs);
+  font-weight: 700;
+}
+
+.import-stepper__item--active {
+  color: #fff;
+  background: var(--color-brand-primary);
+  border-color: var(--color-brand-primary);
+}
+
+.validation-preview {
+  background: var(--color-bg-surface);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
+  margin-bottom: var(--space-6);
+  box-shadow: var(--shadow-card);
+}
+
+.validation-preview h3 {
+  font-family: var(--font-heading);
+  margin-bottom: var(--space-3);
+}
+
+.validation-preview__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: var(--space-2);
+}
+
+.validation-preview__grid div {
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-md);
+  padding: var(--space-3);
+}
+
+.validation-preview__grid strong,
+.validation-preview__grid span {
+  display: block;
 }
 
 /* ── Drop Zone ────────────────────────────────────────────────────────────── */

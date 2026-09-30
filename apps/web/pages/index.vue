@@ -3,21 +3,53 @@ import { useDashboardStore } from '~/stores/dashboard';
 import { useProductsStore } from '~/stores/products';
 import { formatBnDate, formatBnInt } from '@ajkerbazardor/shared';
 
-// SEO
+useSeoMeta({
+  title: 'আজকের বাজারদর — ঢাকার দৈনিক বাজারদর',
+  description:
+    'ঢাকার পাঁচটি বাজারের নিত্যপ্রয়োজনীয় পণ্যের দৈনিক খুচরা দাম — TCB বুলেটিন থেকে সংগৃহীত স্বাধীন মূল্য-তথ্য প্রকল্প।',
+  ogTitle: 'আজকের বাজারদর — ঢাকার দৈনিক বাজারদর',
+  ogDescription: 'ঢাকার পাঁচটি প্রধান বাজারের নিত্যপ্রয়োজনীয় পণ্যের দৈনিক খুচরা দাম — এক জায়গায়।',
+  ogImage: 'https://ajkerbazardor.vercel.app/images/hero-bazaar.jpg',
+  ogUrl: 'https://ajkerbazardor.vercel.app',
+  twitterCard: 'summary_large_image',
+  twitterImage: 'https://ajkerbazardor.vercel.app/images/hero-bazaar.jpg',
+});
+
 useHead({
-  title: 'আজকের বাজার দর — ঢাকার খুচরা বাজারের দৈনিক দাম',
-  meta: [
+  link: [{ rel: 'canonical', href: 'https://ajkerbazardor.vercel.app/' }],
+  script: [
     {
-      name: 'description',
-      content: 'ঢাকার বাজারে আজকে কত দামে বিক্রি হচ্ছে চাল, ডাল, তেল, সবজি, মাছ, মাংস? TCB-র দৈনিক খুচরা মূল্য।',
+      type: 'application/ld+json',
+      innerHTML: JSON.stringify({
+        '@context': 'https://schema.org',
+        '@type': 'WebSite',
+        name: 'আজকের বাজারদর',
+        url: 'https://ajkerbazardor.vercel.app',
+        potentialAction: {
+          '@type': 'SearchAction',
+          target: 'https://ajkerbazardor.vercel.app/search?q={search_term_string}',
+          'query-input': 'required name=search_term_string',
+        },
+      }),
     },
   ],
 });
 
 const dashboard = useDashboardStore();
 const products = useProductsStore();
+const selectedMarket = ref('all-dhaka');
 
-// Server-side fetch
+useStaggerFade('.metric', 0.05);
+
+const markets = [
+  { slug: 'all-dhaka', name: 'ঢাকার ৫ বাজার', products: 60, updated: 'আজ' },
+  { slug: 'mirpur-6', name: 'Mirpur-6', products: 60, updated: 'আজ' },
+  { slug: 'mohammadpur-town-hall', name: 'Mohammadpur Town Hall', products: 60, updated: 'আজ' },
+  { slug: 'new-market', name: 'New Market', products: 60, updated: 'আজ' },
+  { slug: 'rampura', name: 'Rampura', products: 60, updated: 'আজ' },
+  { slug: 'mohakhali', name: 'Mohakhali', products: 60, updated: 'আজ' },
+];
+
 await useAsyncData('home-init', async () => {
   await Promise.all([
     dashboard.fetchSummary(),
@@ -31,20 +63,16 @@ await useAsyncData('home-init', async () => {
 function onSearch(q: string) {
   products.setSearch(q);
 }
-
 function onCategory(slug: string | null) {
   products.setCategory(slug);
 }
-
 function onSort(sort: string) {
   products.setSort(sort as import('~/stores/products').SortKey);
 }
-
 function onProductClick(slug: string) {
-  navigateTo(`/panna/${slug}`);
+  navigateTo(`/prices/${slug}`);
 }
 
-// Infinite scroll — next page on scroll sentinel visibility
 const sentinel = ref<HTMLElement | null>(null);
 const { stop } = useIntersectionObserver(
   sentinel,
@@ -60,445 +88,558 @@ onUnmounted(() => stop());
 
 <template>
   <div>
-    <!-- ── Site Header ──────────────────────────────────────────────────── -->
-    <SiteHeader :latest-date="dashboard.latestDate" @search="onSearch" />
+    <SiteHeader :latest-date="dashboard.latestDate" transparent @search="onSearch" />
 
-    <!-- ── Hero / Summary Banner ──────────────────────────────────────── -->
-    <section v-if="dashboard.summary" class="hero-banner" aria-label="আজকের বাজার সারসংক্ষেপ">
-      <div class="container">
-        <div class="hero-banner__content">
-          <h1 class="hero-banner__title">
-            আজকের বাজার দর
-            <span class="hero-banner__date">
-              {{ formatBnDate(dashboard.summary.date) }}
-            </span>
-          </h1>
-          <p class="hero-banner__subtitle">ঢাকার খুচরা বাজারের TCB-র দৈনিক মূল্য তালিকা।</p>
+    <section class="hero" aria-labelledby="hero-title">
+      <div class="hero__bg" aria-hidden="true">
+        <img
+          src="/images/hero-bazaar.jpg"
+          alt=""
+          class="hero__bg-img"
+          width="1024"
+          height="438"
+          loading="eager"
+          fetchpriority="high"
+        />
+        <div class="hero__bg-overlay" />
+      </div>
 
-          <!-- Stat Row -->
-          <div class="hero-stats" role="list">
-            <div class="hero-stat" role="listitem">
-              <span class="hero-stat__value">{{ formatBnInt(dashboard.summary.productCount) }}</span>
-              <span class="hero-stat__label">মোট পণ্য</span>
-            </div>
-            <div class="hero-stat hero-stat--up" role="listitem">
-              <span class="hero-stat__value">{{ formatBnInt(dashboard.summary.risingCount) }}</span>
-              <span class="hero-stat__label">মূল্য বেড়েছে</span>
-            </div>
-            <div class="hero-stat hero-stat--down" role="listitem">
-              <span class="hero-stat__value">{{ formatBnInt(dashboard.summary.fallingCount) }}</span>
-              <span class="hero-stat__label">মূল্য কমেছে</span>
-            </div>
-            <div class="hero-stat" role="listitem">
-              <span class="hero-stat__value">{{ formatBnInt(dashboard.summary.unchangedCount) }}</span>
-              <span class="hero-stat__label">অপরিবর্তিত</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Top Movers (risers + fallers) -->
-        <div v-if="dashboard.moversDay" class="movers-row">
-          <div class="movers-col">
-            <h2 class="movers-col__title movers-col__title--up">
-              <span aria-hidden="true">↑</span> সবচেয়ে বেশি বেড়েছে
-            </h2>
-            <ul class="movers-list">
-              <li v-for="m in dashboard.moversDay.risers.slice(0, 4)" :key="m.id" class="movers-item movers-item--up">
-                <NuxtLink :to="`/panna/${m.slug}`" class="movers-item__link">
-                  <span class="movers-item__name">{{ m.nameBn }}</span>
-                  <span class="movers-item__pct">{{ m.changePct !== null ? `+${m.changePct.toFixed(1)}%` : '' }}</span>
-                </NuxtLink>
-              </li>
-            </ul>
-          </div>
-
-          <div class="movers-col">
-            <h2 class="movers-col__title movers-col__title--down">
-              <span aria-hidden="true">↓</span> সবচেয়ে বেশি কমেছে
-            </h2>
-            <ul class="movers-list">
-              <li
-                v-for="m in dashboard.moversDay.fallers.slice(0, 4)"
-                :key="m.id"
-                class="movers-item movers-item--down"
-              >
-                <NuxtLink :to="`/panna/${m.slug}`" class="movers-item__link">
-                  <span class="movers-item__name">{{ m.nameBn }}</span>
-                  <span class="movers-item__pct">{{ m.changePct !== null ? `${m.changePct.toFixed(1)}%` : '' }}</span>
-                </NuxtLink>
-              </li>
-            </ul>
+      <div class="hero__container">
+        <div class="hero__copy">
+          <p class="eyebrow">TCB বুলেটিন থেকে সংগৃহীত • স্বাধীন প্রকল্প</p>
+          <h1 id="hero-title">আজকের বাজারদর</h1>
+          <p class="hero__lead">ঢাকার পাঁচটি বাজারের নিত্যপ্রয়োজনীয় পণ্যের দৈনিক খুচরা দাম — এক জায়গায়।</p>
+          <form
+            class="hero-search"
+            role="search"
+            @submit.prevent="onSearch(($event.target as HTMLFormElement).q.value)"
+          >
+            <label class="sr-only" for="hero-q">পণ্য খুঁজুন</label>
+            <input id="hero-q" name="q" placeholder="আপনি কোন পণ্যের দাম জানতে চান?" />
+            <button type="submit">দাম দেখুন</button>
+          </form>
+          <div class="hero__actions">
+            <NuxtLink to="/prices" class="link-pill link-pill--primary">আজকের বাজার</NuxtLink>
+            <NuxtLink to="/about" class="link-pill link-pill--secondary">কীভাবে ডেটা আসে</NuxtLink>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- ── Category Nav + Filter Bar ──────────────────────────────────── -->
-    <div class="filter-bar">
-      <div class="container">
-        <!-- Category pills -->
-        <CategoryNav :categories="products.categories" :active-slug="products.activeCategory" @select="onCategory" />
+    <main id="main-content">
+      <section class="section snapshot" aria-labelledby="snapshot-title">
+        <div class="section-head">
+          <p class="eyebrow">আজকের ডেটা</p>
+          <h2 id="snapshot-title">আজকের বাজার এক নজরে</h2>
+        </div>
+        <div class="metrics">
+          <article class="metric">
+            <span>সর্বশেষ আপডেট</span
+            ><strong>{{ dashboard.latestDate ? formatBnDate(dashboard.latestDate) : '—' }}</strong>
+          </article>
+          <article class="metric">
+            <span>মোট পণ্য</span
+            ><strong>{{ formatBnInt(dashboard.summary?.productCount ?? products.meta?.total ?? 0) }}</strong>
+          </article>
+          <article class="metric"><span>ট্র্যাক করা বাজার</span><strong>৫</strong></article>
+          <article class="metric metric--up">
+            <span>দাম বেড়েছে</span><strong>↑ {{ formatBnInt(dashboard.summary?.risingCount ?? 0) }}</strong>
+          </article>
+          <article class="metric metric--down">
+            <span>দাম কমেছে</span><strong>↓ {{ formatBnInt(dashboard.summary?.fallingCount ?? 0) }}</strong>
+          </article>
+          <article class="metric">
+            <span>অপরিবর্তিত</span><strong>— {{ formatBnInt(dashboard.summary?.unchangedCount ?? 0) }}</strong>
+          </article>
+        </div>
+      </section>
 
-        <!-- Sort select -->
-        <div class="filter-bar__sort">
-          <label for="sort-select" class="sr-only">সাজান</label>
-          <select
-            id="sort-select"
-            class="sort-select"
-            :value="products.sort"
-            @change="onSort(($event.target as HTMLSelectElement).value)"
+      <section class="section" aria-labelledby="markets-title">
+        <div class="section-head section-head--row">
+          <div>
+            <p class="eyebrow">বাজার</p>
+            <h2 id="markets-title">বাজার নির্বাচন করুন</h2>
+          </div>
+          <NuxtLink to="/markets">সব বাজার দেখুন</NuxtLink>
+        </div>
+        <div class="market-strip" role="list">
+          <button
+            v-for="market in markets"
+            :key="market.slug"
+            type="button"
+            class="market-pill"
+            :class="{ 'market-pill--active': selectedMarket === market.slug }"
+            @click="selectedMarket = market.slug"
           >
-            <option value="sort_order">স্বাভাবিক</option>
-            <option value="price_asc">দাম ↑</option>
-            <option value="price_desc">দাম ↓</option>
-            <option value="change_desc">পরিবর্তন ↑</option>
-            <option value="change_asc">পরিবর্তন ↓</option>
-            <option value="name">নাম অনুযায়ী</option>
-          </select>
+            <strong>{{ market.name }}</strong>
+            <span>{{ formatBnInt(market.products) }} পণ্য • {{ market.updated }}</span>
+          </button>
         </div>
-      </div>
-    </div>
+      </section>
 
-    <!-- ── Products Grid ───────────────────────────────────────────────── -->
-    <main id="main-content" class="container products-section">
-      <!-- Error state -->
-      <div v-if="products.error" class="error-banner" role="alert">
-        {{ products.error }}
-      </div>
-
-      <!-- Grid -->
-      <div v-if="products.items.length > 0" class="products-grid" role="list" aria-label="পণ্য তালিকা">
-        <div v-for="product in products.items" :key="product.id" role="listitem">
-          <ProductCard v-bind="product" @click="onProductClick" />
+      <section class="section" aria-labelledby="categories-title">
+        <div class="section-head section-head--row">
+          <div>
+            <p class="eyebrow">ক্যাটাগরি</p>
+            <h2 id="categories-title">পণ্য ধরন</h2>
+          </div>
+          <div class="sort-wrap">
+            <label for="sort-select">সাজান</label>
+            <select
+              id="sort-select"
+              :value="products.sort"
+              @change="onSort(($event.target as HTMLSelectElement).value)"
+            >
+              <option value="sort_order">স্বাভাবিক</option>
+              <option value="price_asc">দাম ↑</option>
+              <option value="price_desc">দাম ↓</option>
+              <option value="change_desc">পরিবর্তন ↑</option>
+              <option value="change_asc">পরিবর্তন ↓</option>
+              <option value="name">নাম অনুযায়ী</option>
+            </select>
+          </div>
         </div>
-      </div>
+        <CategoryNav :categories="products.categories" :active-slug="products.activeCategory" @select="onCategory" />
+      </section>
 
-      <!-- Empty state -->
-      <div v-else-if="!products.loading" class="empty-state">
-        <p class="empty-state__text">কোনো পণ্য পাওয়া যায়নি।</p>
-      </div>
-
-      <!-- Skeleton loading -->
-      <div v-if="products.loading" class="products-grid products-grid--loading" aria-busy="true" aria-label="লোড হচ্ছে">
-        <div v-for="n in 8" :key="`sk-${n}`" class="skeleton-card" aria-hidden="true" />
-      </div>
-
-      <!-- Infinite scroll sentinel -->
-      <div ref="sentinel" class="scroll-sentinel" aria-hidden="true" />
+      <section class="section" aria-labelledby="prices-title">
+        <div class="section-head section-head--row">
+          <div>
+            <p class="eyebrow">বিক্রি নয়, তথ্য</p>
+            <h2 id="prices-title">আজকের দাম</h2>
+          </div>
+          <NuxtLink to="/prices">ডেটা টেবিল দেখুন</NuxtLink>
+        </div>
+        <div v-if="products.error" class="state state--error" role="alert">
+          <strong>দুঃখিত, বাজারদরের তথ্য এই মুহূর্তে লোড করা যাচ্ছে না।</strong>
+          <button type="button" @click="products.fetchProducts({ resetItems: true })">আবার চেষ্টা করুন</button>
+        </div>
+        <div v-if="products.items.length > 0" class="products-grid" role="list" aria-label="পণ্য তালিকা">
+          <div v-for="product in products.items" :key="product.id" role="listitem">
+            <ProductCard v-bind="product" @click="onProductClick" />
+          </div>
+        </div>
+        <div v-else-if="!products.loading" class="state">আজকের বাজারদর এখনও পাওয়া যায়নি।</div>
+        <div v-if="products.loading" class="products-grid" aria-busy="true" aria-label="লোড হচ্ছে">
+          <div v-for="n in 10" :key="n" class="skeleton-card" />
+        </div>
+        <div ref="sentinel" class="scroll-sentinel" aria-hidden="true" />
+      </section>
     </main>
 
-    <!-- ── Footer ─────────────────────────────────────────────────────── -->
-    <footer class="site-footer">
-      <div class="container">
-        <p class="site-footer__text">
-          মূল্য তথ্য সূত্র: <abbr title="ট্রেডিং কর্পোরেশন অব বাংলাদেশ">টিসিবি</abbr> — Trading Corporation of
-          Bangladesh. এই তথ্য শুধুমাত্র তথ্যগত উদ্দেশ্যে প্রদান করা হয়েছে।
-        </p>
-      </div>
-    </footer>
+    <SiteFooter />
   </div>
 </template>
 
 <style scoped>
-/* ── Layout helpers ──────────────────────────────────────────────────────── */
-.container {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 0 var(--space-4);
-}
-
 .sr-only {
   position: absolute;
   width: 1px;
   height: 1px;
-  padding: 0;
-  margin: -1px;
   overflow: hidden;
   clip: rect(0, 0, 0, 0);
-  white-space: nowrap;
-  border-width: 0;
 }
-
-/* ── Hero Banner ─────────────────────────────────────────────────────────── */
-.hero-banner {
-  background: linear-gradient(
-    135deg,
-    var(--color-brand-subtle) 0%,
-    var(--color-bg-surface) 60%,
-    var(--color-bg-canvas) 100%
-  );
-  border-bottom: 1px solid var(--color-brand-border);
-  padding: var(--space-8) 0 var(--space-6);
-}
-
-.hero-banner__content {
-  margin-bottom: var(--space-6);
-}
-
-.hero-banner__title {
-  font-family: var(--font-heading);
-  font-size: clamp(1.5rem, 4vw, 2.5rem);
-  font-weight: 700;
-  color: var(--color-text-primary);
-  line-height: var(--leading-tight);
-  margin-bottom: var(--space-2);
-}
-
-.hero-banner__date {
-  display: inline-block;
-  font-size: clamp(1rem, 2.5vw, 1.5rem);
-  color: var(--color-brand-primary);
-  margin-left: var(--space-2);
-}
-
-.hero-banner__subtitle {
-  font-family: var(--font-body);
-  font-size: var(--text-base);
-  color: var(--color-text-secondary);
-  margin-bottom: var(--space-6);
-}
-
-/* ── Stat Row ────────────────────────────────────────────────────────────── */
-.hero-stats {
+.hero {
+  position: relative;
+  width: 100%;
+  min-height: 100vh;
+  min-height: 100dvh;
   display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-3);
+  align-items: center;
+  background-color: #0d1b18;
+  overflow: hidden;
 }
-
-.hero-stat {
-  background-color: var(--color-bg-surface);
-  border: 1px solid var(--color-border-subtle);
-  border-radius: var(--radius-md);
-  padding: var(--space-3) var(--space-4);
-  min-width: 100px;
-  text-align: center;
-  box-shadow: var(--shadow-sm);
+.hero__bg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  pointer-events: none;
 }
-
-.hero-stat--up {
-  border-color: var(--color-trend-up-border);
-  background-color: var(--color-trend-up-bg);
-}
-
-.hero-stat--down {
-  border-color: var(--color-trend-down-border);
-  background-color: var(--color-trend-down-bg);
-}
-
-.hero-stat__value {
+.hero__bg-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center right;
   display: block;
-  font-family: var(--font-heading);
-  font-size: var(--text-2xl);
-  font-weight: 700;
-  color: var(--color-text-primary);
-  line-height: 1.1;
 }
-
-.hero-stat--up .hero-stat__value {
-  color: var(--color-trend-up);
+.hero__bg-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    rgba(13, 27, 24, 0.97) 0%,
+    rgba(13, 27, 24, 0.92) 38%,
+    rgba(13, 27, 24, 0.62) 65%,
+    rgba(13, 27, 24, 0.2) 100%
+  );
 }
-
-.hero-stat--down .hero-stat__value {
-  color: var(--color-trend-down);
-}
-
-.hero-stat__label {
-  display: block;
-  font-family: var(--font-body);
-  font-size: var(--text-xs);
-  color: var(--color-text-muted);
-  margin-top: var(--space-0-5);
-}
-
-/* ── Movers Row ──────────────────────────────────────────────────────────── */
-.movers-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: var(--space-4);
-  margin-top: var(--space-4);
-}
-
-@media (max-width: 640px) {
-  .movers-row {
-    grid-template-columns: 1fr;
-  }
-}
-
-.movers-col__title {
-  font-family: var(--font-body);
-  font-size: var(--text-sm);
-  font-weight: 600;
-  margin-bottom: var(--space-2);
-}
-
-.movers-col__title--up {
-  color: var(--color-trend-up);
-}
-
-.movers-col__title--down {
-  color: var(--color-trend-down);
-}
-
-.movers-list {
-  list-style: none;
+.hero__container {
+  width: 100%;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: calc(56px + clamp(1.5rem, 4vw, 3rem)) 1rem clamp(2rem, 5vw, 4rem);
+  min-height: 100vh;
+  min-height: 100dvh;
   display: flex;
   flex-direction: column;
-  gap: var(--space-1);
+  justify-content: center;
+  position: relative;
+  z-index: 2;
 }
-
-.movers-item {
-  border-radius: var(--radius-sm);
-  overflow: hidden;
+.hero__copy {
+  max-width: 620px;
+  position: relative;
 }
-
-.movers-item__link {
+.hero__badge-row {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  padding: var(--space-1-5) var(--space-3);
-  text-decoration: none;
-  font-family: var(--font-body);
-  font-size: var(--text-sm);
-  border-radius: var(--radius-sm);
-  transition: background-color var(--duration-fast);
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  margin-bottom: 1rem;
 }
-
-.movers-item--up .movers-item__link {
-  background-color: var(--color-trend-up-bg);
-  color: var(--color-trend-up-text);
-}
-
-.movers-item--up .movers-item__link:hover {
-  background-color: var(--color-trend-up-border);
-}
-
-.movers-item--down .movers-item__link {
-  background-color: var(--color-trend-down-bg);
-  color: var(--color-trend-down-text);
-}
-
-.movers-item--down .movers-item__link:hover {
-  background-color: var(--color-trend-down-border);
-}
-
-.movers-item__name {
-  font-weight: 500;
-}
-
-.movers-item__pct {
+.hero__live-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  color: #fef3c7;
+  padding: 0.35rem 0.85rem;
+  border-radius: 999px;
+  font-size: 0.82rem;
   font-weight: 700;
-  font-size: var(--text-xs);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
 }
-
-/* ── Filter Bar ──────────────────────────────────────────────────────────── */
-.filter-bar {
-  background-color: var(--color-bg-canvas);
-  border-bottom: 1px solid var(--color-border-subtle);
-  position: sticky;
-  top: 56px; /* below site header */
-  z-index: 40;
+.hero__pulse {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #22c55e;
+  box-shadow: 0 0 10px #22c55e;
+  animation: pulse-dot 2s infinite;
 }
-
-.filter-bar .container {
-  display: flex;
+@keyframes pulse-dot {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.4;
+    transform: scale(0.8);
+  }
+}
+.hero__market-tag {
+  display: inline-flex;
   align-items: center;
-  gap: var(--space-2);
+  background: #facc15;
+  color: #7f1d1d;
+  font-weight: 900;
+  border-radius: 999px;
+  padding: 0.25rem 0.75rem;
+  font-size: 0.8rem;
+  border: 1px solid #eab308;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+.eyebrow {
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  color: #34d399;
+  font-size: 0.85rem;
+}
+.hero h1 {
+  font-family: var(--font-heading);
+  font-size: clamp(3rem, 7vw, 5.5rem);
+  line-height: 1;
+  margin: 0.4rem 0;
+  color: #ffffff;
+  text-shadow: 0 2px 20px rgba(0, 0, 0, 0.4);
+}
+.hero__lead {
+  font-size: clamp(1.1rem, 2vw, 1.4rem);
+  max-width: 36rem;
+  color: #e2e8f0;
+  line-height: 1.5;
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.3);
+}
+.hero-search {
+  margin-top: 1.5rem;
+  display: flex;
+  max-width: 44rem;
+  background: white;
+  border: 2px solid rgba(255, 255, 255, 0.95);
+  border-radius: 999px;
+  box-shadow: 0 18px 45px rgba(0, 0, 0, 0.35);
   overflow: hidden;
 }
-
-.filter-bar__sort {
-  margin-left: auto;
-  flex-shrink: 0;
-  padding: var(--space-2-5) 0;
+.hero-search input {
+  flex: 1;
+  border: 0;
+  padding: 1rem 1.35rem;
+  font-size: 1rem;
+  outline: 0;
+  color: #1c1917;
 }
-
-.sort-select {
-  height: 36px;
-  padding: 0 var(--space-3);
-  border-radius: var(--radius-sm);
-  border: 1px solid var(--color-border-strong);
-  background-color: var(--color-bg-surface);
-  color: var(--color-text-primary);
-  font-family: var(--font-body);
-  font-size: var(--text-sm);
+.hero-search button {
+  border: 0;
+  background: #b91c1c;
+  color: white;
+  font-weight: 800;
+  padding: 0 1.6rem;
   cursor: pointer;
-  outline: none;
-  transition: border-color var(--duration-fast);
+  transition: background 0.2s ease;
 }
-
-.sort-select:focus {
-  border-color: var(--color-brand-primary);
+.hero-search button:hover {
+  background: #991b1b;
 }
-
-/* ── Products Section ────────────────────────────────────────────────────── */
-.products-section {
-  padding-top: var(--space-6);
-  padding-bottom: var(--space-16);
+.hero__actions {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  margin-top: 1.25rem;
 }
-
+.hero__disclaimer {
+  font-size: 0.85rem;
+  color: #cbd5e1;
+  margin-top: 1rem;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+}
+.link-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  padding: 0.7rem 1.2rem;
+  font-weight: 800;
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+.link-pill--primary {
+  background: #facc15;
+  color: #7f1d1d;
+  border: 1px solid #facc15;
+  box-shadow: 0 4px 14px rgba(250, 204, 21, 0.3);
+}
+.link-pill--primary:hover {
+  background: #eab308;
+  border-color: #eab308;
+  text-decoration: none;
+}
+.link-pill--secondary {
+  background: rgba(255, 255, 255, 0.12);
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+.link-pill--secondary:hover {
+  background: rgba(255, 255, 255, 0.22);
+  border-color: rgba(255, 255, 255, 0.5);
+  text-decoration: none;
+}
+.section {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 2.25rem 1rem;
+}
+.section-head {
+  margin-bottom: 1rem;
+}
+.section-head h2 {
+  font-family: var(--font-heading);
+  font-size: clamp(1.7rem, 3vw, 2.5rem);
+  margin: 0.15rem 0;
+  color: #10231f;
+}
+.section-head--row {
+  display: flex;
+  justify-content: space-between;
+  align-items: end;
+  gap: 1rem;
+}
+.metrics {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 0.85rem;
+}
+.metric {
+  background: white;
+  border: 1px solid var(--color-border-subtle);
+  border-radius: 18px;
+  padding: 1rem;
+  box-shadow: var(--shadow-card);
+}
+.metric span {
+  display: block;
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
+}
+.metric strong {
+  display: block;
+  margin-top: 0.3rem;
+  font-size: 1.35rem;
+}
+.metric--up strong {
+  color: var(--color-trend-up);
+}
+.metric--down strong {
+  color: var(--color-trend-down);
+}
+.market-strip {
+  display: flex;
+  gap: 0.75rem;
+  overflow: auto;
+  padding: 0.25rem 0.1rem 0.75rem;
+}
+.market-pill {
+  min-width: 210px;
+  text-align: left;
+  border: 1px solid var(--color-border-subtle);
+  background: white;
+  border-radius: 18px;
+  padding: 1rem;
+  box-shadow: var(--shadow-card);
+  cursor: pointer;
+}
+.market-pill strong,
+.market-pill span {
+  display: block;
+}
+.market-pill span {
+  font-size: 0.85rem;
+  color: var(--color-text-muted);
+  margin-top: 0.3rem;
+}
+.market-pill--active {
+  background: #0f766e;
+  color: white;
+  border-color: #0f766e;
+}
+.market-pill--active span {
+  color: #ccfbf1;
+}
+.sort-wrap {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.sort-wrap select {
+  height: 40px;
+  border-radius: 999px;
+  border: 1px solid var(--color-border-strong);
+  background: white;
+  padding: 0 0.9rem;
+}
 .products-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: var(--space-4);
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 1rem;
 }
-
-/* Skeleton cards */
 .skeleton-card {
   height: 280px;
-  border-radius: var(--radius-lg);
-  background: linear-gradient(90deg, var(--color-bg-muted) 25%, var(--color-bg-subtle) 50%, var(--color-bg-muted) 75%);
+  border-radius: 18px;
+  background: linear-gradient(90deg, #ebe5df 25%, #fff 50%, #ebe5df 75%);
   background-size: 200% 100%;
-  animation: shimmer 1.5s infinite;
+  animation: shimmer 1.3s infinite;
 }
-
 @keyframes shimmer {
-  0% {
-    background-position: 200% 0;
-  }
-  100% {
+  to {
     background-position: -200% 0;
   }
 }
-
-/* Error & Empty ─────────────────────────────────────────────────────────── */
-.error-banner {
-  background-color: var(--color-trend-up-bg);
-  color: var(--color-trend-up-text);
-  border: 1px solid var(--color-trend-up-border);
-  border-radius: var(--radius-md);
-  padding: var(--space-4);
-  margin-bottom: var(--space-4);
-}
-
-.empty-state {
-  padding: var(--space-16) 0;
+.state {
+  background: white;
+  border: 1px dashed var(--color-border-strong);
+  border-radius: 18px;
+  padding: 2rem;
   text-align: center;
 }
-
-.empty-state__text {
-  font-family: var(--font-body);
-  font-size: var(--text-lg);
-  color: var(--color-text-muted);
+.state--error {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  justify-content: space-between;
+  color: #7f1d1d;
+  background: #fff1f2;
 }
-
+.state button {
+  border: 0;
+  border-radius: 999px;
+  background: #0f766e;
+  color: white;
+  padding: 0.6rem 1rem;
+  font-weight: 800;
+}
 .scroll-sentinel {
   height: 2px;
-  margin-top: var(--space-8);
+  margin-top: 2rem;
 }
-
-/* ── Site Footer ─────────────────────────────────────────────────────────── */
-.site-footer {
-  background-color: var(--color-bg-subtle);
-  border-top: 1px solid var(--color-border-subtle);
-  padding: var(--space-6) 0;
-  margin-top: auto;
+@media (max-width: 980px) {
+  .hero {
+    min-height: 100vh;
+    min-height: 100dvh;
+  }
+  .hero__container {
+    min-height: 100vh;
+    min-height: 100dvh;
+    padding-top: calc(56px + 2rem);
+    padding-bottom: 2.5rem;
+  }
+  .hero__bg-overlay {
+    background: linear-gradient(
+      135deg,
+      rgba(13, 27, 24, 0.95) 0%,
+      rgba(13, 27, 24, 0.88) 50%,
+      rgba(13, 27, 24, 0.55) 100%
+    );
+  }
+  .metrics {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  .products-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
 }
-
-.site-footer__text {
-  font-family: var(--font-body);
-  font-size: var(--text-sm);
-  color: var(--color-text-muted);
-  text-align: center;
-  line-height: var(--leading-relaxed);
+@media (max-width: 640px) {
+  .hero {
+    min-height: 100vh;
+    min-height: 100dvh;
+    padding: 0;
+  }
+  .hero__bg-overlay {
+    background: linear-gradient(
+      180deg,
+      rgba(13, 27, 24, 0.95) 0%,
+      rgba(13, 27, 24, 0.88) 60%,
+      rgba(13, 27, 24, 0.96) 100%
+    );
+  }
+  .hero__container {
+    min-height: 100vh;
+    min-height: 100dvh;
+    padding: calc(56px + 1.25rem) 1rem 2rem;
+  }
+  .hero-search {
+    border-radius: 20px;
+    flex-direction: column;
+  }
+  .hero-search button {
+    padding: 0.9rem;
+  }
+  .metrics {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .products-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.75rem;
+  }
+  .section-head--row {
+    align-items: flex-start;
+    flex-direction: column;
+  }
 }
 </style>

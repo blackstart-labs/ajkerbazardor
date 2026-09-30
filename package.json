@@ -6,6 +6,7 @@
   "packageManager": "pnpm@12.6.0",
   "scripts": {
     "dev": "pnpm --parallel run dev",
+    "dev:all": "./dev.sh",
     "build": "pnpm --recursive run build",
     "test": "pnpm --recursive run test",
     "test:coverage": "pnpm --recursive run test:coverage",

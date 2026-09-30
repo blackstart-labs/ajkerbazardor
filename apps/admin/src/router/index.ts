@@ -26,6 +26,16 @@ const router = createRouter({
           component: () => import('../views/UploadView.vue'),
         },
         {
+          path: 'imports',
+          name: 'Imports',
+          component: () => import('../views/AdminWorkflowView.vue'),
+        },
+        {
+          path: 'prices',
+          name: 'PriceData',
+          component: () => import('../views/AdminWorkflowView.vue'),
+        },
+        {
           path: 'products',
           name: 'Products',
           component: () => import('../views/ProductsView.vue'),
@@ -39,6 +49,21 @@ const router = createRouter({
           path: 'reports',
           name: 'Reports',
           component: () => import('../views/ReportsView.vue'),
+        },
+        {
+          path: 'markets',
+          name: 'Markets',
+          component: () => import('../views/AdminWorkflowView.vue'),
+        },
+        {
+          path: 'validation',
+          name: 'Validation',
+          component: () => import('../views/AdminWorkflowView.vue'),
+        },
+        {
+          path: 'settings',
+          name: 'Settings',
+          component: () => import('../views/AdminWorkflowView.vue'),
         },
         {
           path: 'audit',

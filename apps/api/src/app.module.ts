@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
+import { APP_GUARD } from '@nestjs/core';
 import { ConfigModule } from '@nestjs/config';
-import { ThrottlerModule } from '@nestjs/throttler';
+import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { envSchema } from './config/env.schema.js';
 import { DrizzleModule } from './drizzle/drizzle.module.js';
 import { AuthModule } from './auth/auth.module.js';
@@ -38,6 +39,12 @@ import { HealthModule } from './health/health.module.js';
     CatalogueModule,
     ReadModule,
     HealthModule,
+  ],
+  providers: [
+    {
+      provide: APP_GUARD,
+      useClass: ThrottlerGuard,
+    },
   ],
 })
 export class AppModule {}
