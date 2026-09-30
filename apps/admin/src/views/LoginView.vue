@@ -1,8 +1,7 @@
 <script setup lang="ts">
-import { ref, reactive, computed } from 'vue';
+import { ref, reactive } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { useAuthStore } from '../stores/auth';
-import { getApiTargetMode, setApiTargetMode, getApiBase, type ApiTargetMode } from '../api/client';
 
 const auth = useAuthStore();
 const router = useRouter();
@@ -10,14 +9,6 @@ const route = useRoute();
 
 const form = reactive({ email: '', password: '' });
 const showPassword = ref(false);
-const currentMode = ref<ApiTargetMode>(getApiTargetMode());
-
-const currentBaseUrl = computed(() => getApiBase());
-
-function switchMode(mode: ApiTargetMode) {
-  currentMode.value = mode;
-  setApiTargetMode(mode);
-}
 
 function fillLocalCredentials() {
   form.email = 'admin@ajkerbazardor.com';
@@ -52,35 +43,6 @@ async function handleLogin() {
         <span class="portal-badge">অ্যাডমিন কন্ট্রোল পোর্টাল</span>
         <h1 id="login-heading" class="login-card__title">আজকের বাজার দর</h1>
         <p class="login-card__subtitle">টিসিবি বাজারদর মনিটরিং ও কন্ট্রোল প্যানেলে প্রবেশ করুন</p>
-      </div>
-
-      <!-- ── Local vs Live Target Control Switcher ── -->
-      <div class="server-control-card">
-        <span class="server-control-label">সার্ভার টার্গেট নির্বাচন করুন:</span>
-        <div class="server-pills" role="tablist">
-          <button
-            type="button"
-            class="server-pill"
-            :class="{ 'server-pill--active': currentMode === 'local' }"
-            @click="switchMode('local')"
-          >
-            <span class="mode-dot mode-dot--local" />
-            <span class="mode-text">💻 লোকাল API (Local:3000)</span>
-          </button>
-          <button
-            type="button"
-            class="server-pill"
-            :class="{ 'server-pill--active': currentMode === 'live' }"
-            @click="switchMode('live')"
-          >
-            <span class="mode-dot mode-dot--live" />
-            <span class="mode-text">🌐 লাইভ API (Vercel)</span>
-          </button>
-        </div>
-        <div class="active-endpoint-wrap">
-          <span class="endpoint-label">কানেক্টেড URL:</span>
-          <code class="endpoint-url font-mono">{{ currentBaseUrl }}</code>
-        </div>
       </div>
 
       <!-- Error Banner -->
@@ -339,103 +301,6 @@ async function handleLogin() {
   font-size: var(--text-sm);
   color: var(--color-text-secondary);
   line-height: 1.45;
-}
-
-/* ── Server Control Card ──────────────────────────────────────────────────── */
-.server-control-card {
-  background: var(--color-bg-canvas);
-  border: 1.5px solid var(--color-border-subtle);
-  border-radius: 18px;
-  padding: 1rem 1.15rem;
-  margin-bottom: 1.5rem;
-}
-
-.server-control-label {
-  display: block;
-  font-size: 0.75rem;
-  font-weight: 700;
-  color: var(--color-text-muted);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  margin-bottom: 0.65rem;
-}
-
-.server-pills {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 0.5rem;
-  background: var(--color-bg-surface);
-  padding: 4px;
-  border-radius: 9999px;
-  border: 1px solid var(--color-border-strong);
-}
-
-.server-pill {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.45rem;
-  padding: 0.45rem 0.75rem;
-  border-radius: 9999px;
-  border: none;
-  background: transparent;
-  color: var(--color-text-secondary);
-  font-size: var(--text-xs);
-  font-weight: 700;
-  cursor: pointer;
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-  white-space: nowrap;
-}
-
-.server-pill:hover {
-  color: var(--color-text-primary);
-}
-
-.server-pill--active {
-  background: var(--color-coral-gradient) !important;
-  color: #fff !important;
-  box-shadow: 0 4px 14px rgba(244, 68, 46, 0.28);
-}
-
-.mode-dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-}
-
-.mode-dot--local {
-  background: var(--color-accent-green);
-}
-
-.mode-dot--live {
-  background: var(--color-accent-cyan);
-}
-
-.server-pill--active .mode-dot {
-  background: #fff;
-}
-
-.active-endpoint-wrap {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  margin-top: 0.65rem;
-  font-size: 0.75rem;
-}
-
-.endpoint-label {
-  color: var(--color-text-muted);
-}
-
-.endpoint-url {
-  color: var(--color-coral-primary);
-  background: var(--color-bg-surface);
-  padding: 2px 6px;
-  border-radius: 4px;
-  border: 1px solid var(--color-border-subtle);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
 }
 
 /* ── Error ────────────────────────────────────────────────────────────────── */
