@@ -18,13 +18,21 @@ onMounted(async () => {
   try {
     const res = await apiGet<{ ok: boolean; data: any[] }>('/admin/imports?limit=30');
     const raw = Array.isArray(res.data) ? res.data : [];
-    reports.value = raw.map((r: any) => ({
-      id: r.id,
-      date: r.reportDate ?? r.date ?? '',
-      productCount: r.stats?.parsed ?? r.stats?.matched ?? r.productCount ?? 0,
-      revisionCount: 1,
-      latestRevisionAt: r.createdAt ?? null,
-    }));
+    reports.value = raw.map((r: any) => {
+      let statsObj: any = {};
+      try {
+        statsObj = typeof r.stats === 'string' ? JSON.parse(r.stats) : (r.stats ?? {});
+      } catch {
+        statsObj = {};
+      }
+      return {
+        id: r.id,
+        date: r.reportDate ?? r.date ?? '',
+        productCount: statsObj.productCount ?? statsObj.parsed ?? r.productCount ?? 0,
+        revisionCount: 1,
+        latestRevisionAt: r.createdAt ?? null,
+      };
+    });
   } catch {
     /* non-fatal */
   } finally {

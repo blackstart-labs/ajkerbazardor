@@ -6,11 +6,11 @@
    ========================================================================== */
 
 :root {
-  /* ── Background & Surfaces (Light / Warm Paper) ────────────────────────── */
-  --color-bg-canvas: #faf7f2;
+  /* ── Background & Surfaces (Theme Green / Fresh Canvas) ────────────────── */
+  --color-bg-canvas: #f0fdf9;
   --color-bg-surface: #ffffff;
-  --color-bg-subtle: #f4efeb;
-  --color-bg-muted: #ebe5df;
+  --color-bg-subtle: #e6f7f2;
+  --color-bg-muted: #d1eee5;
 
   /* ── Typography & Ink ──────────────────────────────────────────────────── */
   --color-text-primary: #1c1917;
@@ -19,11 +19,16 @@
   --color-text-inverse: #faf7f2;
 
   /* ── Brand / Saffron Accent ────────────────────────────────────────────── */
-  --color-brand-primary: #d97706;
-  --color-brand-hover: #b45309;
-  --color-brand-subtle: #fef3c7;
-  --color-brand-border: #fde68a;
-  --color-brand-ink: #78350f;
+  --color-brand-primary: #0f766e;
+  --color-brand-hover: #115e59;
+  --color-brand-subtle: #ccfbf1;
+  --color-brand-border: #5eead4;
+  --color-brand-ink: #134e4a;
+  --color-accent-turmeric: #facc15;
+  --color-accent-saffron: #f59e0b;
+  --color-accent-brick: #b91c1c;
+  --color-accent-leaf: #15803d;
+  --color-paper-texture: rgba(15, 118, 110, 0.05);
 
   /* ── Semantic Directional Colors ───────────────────────────────────────── */
   /* Up = Bad news for consumer / price rise (Brick Red) */

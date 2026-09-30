@@ -15,11 +15,16 @@ async function logout() {
 }
 
 const navItems = [
-  { to: '/', label: 'ড্যাশবোর্ড', icon: 'grid' },
-  { to: '/upload', label: 'ফাইল আপলোড', icon: 'upload' },
-  { to: '/products', label: 'পণ্য তালিকা', icon: 'package' },
-  { to: '/reports', label: 'রিপোর্ট', icon: 'file-text' },
-  { to: '/audit', label: 'অডিট লগ', icon: 'activity' },
+  { to: '/', label: 'Dashboard', icon: 'grid' },
+  { to: '/upload', label: 'Daily Upload', icon: 'upload' },
+  { to: '/prices', label: 'Price Data', icon: 'activity' },
+  { to: '/products', label: 'Products', icon: 'package' },
+  { to: '/markets', label: 'Markets', icon: 'grid' },
+  { to: '/imports', label: 'Import History', icon: 'file-text' },
+  { to: '/validation', label: 'Validation Errors', icon: 'activity' },
+  { to: '/reports', label: 'Published Data', icon: 'file-text' },
+  { to: '/settings', label: 'System', icon: 'grid' },
+  { to: '/audit', label: 'Audit Log', icon: 'activity' },
 ];
 
 function isActive(path: string) {

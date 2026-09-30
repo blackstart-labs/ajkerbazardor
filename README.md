@@ -141,7 +141,7 @@ Store the SQL dump somewhere outside Turso (e.g. an S3 bucket or git-ignored loc
 
 ## Deployment
 
-The project is hosting-agnostic. Dockerfiles are in each app directory.
+The project is hosting-agnostic. Dockerfiles are in each app directory. The API also includes a Vercel serverless entrypoint for existing Vercel deployments, but an always-on Node host is the recommended production shape for Nest/Fastify if serverless cold starts or bundling errors continue.
 
 | App     | Container               | Notes                                     |
 | ------- | ----------------------- | ----------------------------------------- |
@@ -150,6 +150,34 @@ The project is hosting-agnostic. Dockerfiles are in each app directory.
 | `admin` | `apps/admin/Dockerfile` | Static build, serve with nginx or any CDN |
 
 **Database in production:** a separate Turso database per environment (staging, production). Set `TURSO_DATABASE_URL` and `TURSO_AUTH_TOKEN` from your Turso dashboard.
+
+### Vercel API deployment notes
+
+`apps/api/vercel.json` routes all requests to `apps/api/api/index.js`, which loads the compiled `dist/serverless.js`. The Vercel project must build from `apps/api` with:
+
+```bash
+pnpm install --frozen-lockfile
+pnpm build
+```
+
+Required production variables:
+
+- `TURSO_DATABASE_URL`
+- `TURSO_AUTH_TOKEN`
+- `JWT_SECRET`
+- `ADMIN_EMAIL`
+- `ADMIN_PASSWORD`
+- `CORS_ORIGIN` — exact comma-separated public/admin origins; do not use wildcards with credentials.
+- `NODE_ENV=production`
+
+Health checks after deploy:
+
+```bash
+curl https://<api-domain>/health
+curl https://<api-domain>/api/v1/products?limit=1
+```
+
+Rollback path: redeploy the previous working app version and, if bad data was published, use the import undo flow to repoint the affected report to its prior revision.
 
 ---
 

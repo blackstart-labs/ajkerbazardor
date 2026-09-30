@@ -1,6 +1,7 @@
 import { Injectable, Inject, NotFoundException, BadRequestException } from '@nestjs/common';
 import { eq, asc, count } from 'drizzle-orm';
 import type { LibSQLDatabase } from 'drizzle-orm/libsql';
+import { z } from 'zod';
 import { DRIZZLE } from '../drizzle/drizzle.module.js';
 import * as schema from '../drizzle/schema.js';
 
@@ -9,15 +10,44 @@ import { AuditService } from '../audit/audit.service.js';
 export interface CreateCategoryDto {
   slug: string;
   nameBn: string;
-  sortOrder?: number;
-  illustration?: string | null;
+  sortOrder?: number | undefined;
+  illustration?: string | null | undefined;
 }
 
 export interface UpdateCategoryDto {
-  slug?: string;
-  nameBn?: string;
-  sortOrder?: number;
-  illustration?: string | null;
+  slug?: string | undefined;
+  nameBn?: string | undefined;
+  sortOrder?: number | undefined;
+  illustration?: string | null | undefined;
+}
+
+const categorySlugSchema = z
+  .string()
+  .trim()
+  .min(1)
+  .regex(/^[a-z0-9-]+$/);
+const createCategorySchema = z.object({
+  slug: categorySlugSchema,
+  nameBn: z.string().trim().min(1),
+  sortOrder: z.coerce.number().int().min(0).optional(),
+  illustration: z.string().trim().min(1).nullable().optional(),
+});
+const updateCategorySchema = createCategorySchema.partial().refine((dto) => Object.keys(dto).length > 0, {
+  message: 'At least one category field must be provided',
+});
+const reorderSchema = z.array(
+  z.object({
+    id: z.coerce.number().int().positive(),
+    sortOrder: z.coerce.number().int().min(0),
+  }),
+);
+
+function parseAdminDto<T>(schema: z.ZodType<T>, value: unknown): T {
+  const result = schema.safeParse(value);
+  if (!result.success) {
+    throw new BadRequestException(result.error.issues.map((issue) => issue.message).join('; '));
+  }
+  return result.data;
 }
 
 @Injectable()
@@ -41,6 +71,7 @@ export class CategoriesService {
   }
 
   async create(dto: CreateCategoryDto, userId?: number) {
+    dto = parseAdminDto(createCategorySchema, dto);
     const sortOrder = dto.sortOrder ?? 0;
     const [inserted] = await this.db
       .insert(schema.categories)
@@ -68,6 +99,7 @@ export class CategoriesService {
   }
 
   async update(id: number, dto: UpdateCategoryDto, userId?: number) {
+    dto = parseAdminDto(updateCategorySchema, dto);
     const existing = await this.findById(id);
 
     const valuesToUpdate: Record<string, unknown> = {};
@@ -102,6 +134,7 @@ export class CategoriesService {
   }
 
   async reorder(orders: Array<{ id: number; sortOrder: number }>, userId?: number) {
+    orders = parseAdminDto(reorderSchema, orders);
     for (const item of orders) {
       await this.db
         .update(schema.categories)

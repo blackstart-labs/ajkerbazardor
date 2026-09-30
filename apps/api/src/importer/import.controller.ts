@@ -11,6 +11,7 @@ import {
   Inject,
 } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiBearerAuth, ApiConsumes, ApiQuery } from '@nestjs/swagger';
+import { Throttle } from '@nestjs/throttler';
 import type { FastifyRequest } from 'fastify';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard.js';
 import { CurrentUser } from '../auth/decorators/current-user.decorator.js';
@@ -29,6 +30,7 @@ export class ImportController {
   constructor(@Inject(ImportService) private readonly importService: ImportService) {}
 
   @Post('admin/imports')
+  @Throttle({ default: { limit: 10, ttl: 60_000 } })
   @ApiConsumes('multipart/form-data')
   @ApiOperation({ summary: 'Upload TCB daily retail price spreadsheet (.xlsx)' })
   async uploadAdmin(@Req() req: FastifyRequest, @CurrentUser() user: Omit<User, 'passwordHash'>) {
@@ -36,6 +38,7 @@ export class ImportController {
   }
 
   @Post('import/upload')
+  @Throttle({ default: { limit: 10, ttl: 60_000 } })
   @ApiConsumes('multipart/form-data')
   @ApiOperation({ summary: 'Upload TCB daily spreadsheet (alias)' })
   async upload(@Req() req: FastifyRequest, @CurrentUser() user: Omit<User, 'passwordHash'>) {

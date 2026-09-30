@@ -1,6 +1,7 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 import { fileURLToPath } from 'node:url';
 import { join } from 'node:path';
+import { DEFAULT_PUBLIC_API_BASE } from '@ajkerbazardor/shared';
 
 const uiRoot = fileURLToPath(new URL('../../packages/ui/src', import.meta.url));
 
@@ -17,7 +18,9 @@ export default defineNuxtConfig({
   // Runtime config — overridden by environment variables at build/runtime
   runtimeConfig: {
     public: {
-      apiBase: process.env['NUXT_PUBLIC_API_BASE'] ?? 'https://api-tawny-pi-32.vercel.app/api/v1',
+      apiBase:
+        process.env['NUXT_PUBLIC_API_BASE'] ||
+        (process.env.NODE_ENV === 'production' ? DEFAULT_PUBLIC_API_BASE : 'http://localhost:3000/api/v1'),
     },
   },
 
@@ -54,13 +57,23 @@ export default defineNuxtConfig({
           content:
             'ঢাকার বাজারে আজকে কত দামে বিক্রি হচ্ছে চাল, ডাল, তেল, সবজি, মাছ, মাংস? টিসিবির দৈনিক খুচরা মূল্য এক জায়গায়।',
         },
-        { property: 'og:title', content: 'আজকের বাজার দর' },
+        { name: 'theme-color', content: '#0f766e' },
+        { property: 'og:site_name', content: 'আজকের বাজারদর' },
+        { property: 'og:locale', content: 'bn_BD' },
+        { property: 'og:type', content: 'website' },
+        { property: 'og:title', content: 'আজকের বাজারদর — ঢাকার দৈনিক বাজারদর' },
         {
           property: 'og:description',
-          content: 'ঢাকার খুচরা বাজারের দৈনিক দাম — টিসিবি থেকে সরাসরি।',
+          content: 'ঢাকার পাঁচটি প্রধান বাজারের নিত্যপ্রয়োজনীয় পণ্যের দৈনিক খুচরা দাম — এক জায়গায়।',
         },
-        { property: 'og:type', content: 'website' },
-        { name: 'theme-color', content: '#d97706' },
+        { property: 'og:image', content: 'https://ajkerbazardor.vercel.app/images/hero-bazaar.jpg' },
+        { name: 'twitter:card', content: 'summary_large_image' },
+        { name: 'twitter:title', content: 'আজকের বাজারদর — ঢাকার দৈনিক বাজারদর' },
+        {
+          name: 'twitter:description',
+          content: 'ঢাকার পাঁচটি প্রধান বাজারের নিত্যপ্রয়োজনীয় পণ্যের দৈনিক খুচরা দাম — এক জায়গায়।',
+        },
+        { name: 'twitter:image', content: 'https://ajkerbazardor.vercel.app/images/hero-bazaar.jpg' },
       ],
       link: [
         {

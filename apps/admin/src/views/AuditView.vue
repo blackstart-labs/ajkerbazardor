@@ -6,10 +6,12 @@ import { formatBnDate } from '@ajkerbazardor/shared';
 interface AuditEntry {
   id: number;
   action: string;
-  entityType: string;
+  entityType?: string;
+  entity?: string;
   entityId: number | null;
   changes: unknown;
-  createdAt: string;
+  createdAt?: string;
+  at?: string;
   performedBy: string | null;
 }
 
@@ -47,6 +49,23 @@ function actionClass(action: string) {
   if (action.includes('create') || action.includes('import')) return 'badge badge--success';
   return 'badge badge--neutral';
 }
+
+function formatAuditDate(val?: string): string {
+  if (!val) return '—';
+  try {
+    const d = new Date(val.replace(' ', 'T'));
+    return isNaN(d.getTime()) ? val : d.toLocaleString('bn-BD');
+  } catch {
+    return val;
+  }
+}
+
+function formatAuditUser(e: any): string {
+  if (e.performedBy) return e.performedBy;
+  if (e.userEmail) return e.userEmail;
+  if (e.userId) return `ব্যবহারকারী #${e.userId}`;
+  return 'সিস্টেম';
+}
 </script>
 
 <template>
@@ -70,13 +89,13 @@ function actionClass(action: string) {
             </tr>
           </template>
           <tr v-for="e in entries" :key="e.id">
-            <td class="text-muted text-sm">{{ new Date(e.createdAt).toLocaleString('bn-BD') }}</td>
+            <td class="text-muted text-sm font-bn">{{ formatAuditDate(e.createdAt ?? e.at) }}</td>
             <td>
               <span :class="actionClass(e.action)">{{ e.action }}</span>
             </td>
-            <td class="text-muted">{{ e.entityType }}</td>
-            <td class="text-muted">{{ e.entityId ?? '—' }}</td>
-            <td class="text-muted">{{ e.performedBy ?? '—' }}</td>
+            <td class="text-muted">{{ e.entityType ?? e.entity }}</td>
+            <td class="text-muted font-bn">{{ e.entityId ?? '—' }}</td>
+            <td class="text-muted">{{ formatAuditUser(e) }}</td>
           </tr>
           <tr v-if="!loading && entries.length === 0">
             <td colspan="5" class="empty-row">কোনো অডিট লগ পাওয়া যায়নি।</td>
