@@ -10,35 +10,12 @@ export async function bootstrap(): Promise<void> {
   console.warn(`API listening on port ${port} — docs at http://localhost:${port}/api/docs`);
 }
 
-// Start application for local server and Vercel Fluid compute execution
-bootstrap().catch(async (err: unknown) => {
-  console.error('Failed to start API:', err);
-  const http = await import('node:http');
-  const server = http.createServer((req, res) => {
-    const origin = req.headers.origin || '*';
-    res.writeHead(500, {
-      'Content-Type': 'application/json',
-      'Access-Control-Allow-Origin': origin,
-      'Access-Control-Allow-Credentials': 'true',
-      'Access-Control-Allow-Methods': 'GET,POST,PUT,PATCH,DELETE,OPTIONS',
-      'Access-Control-Allow-Headers': 'Content-Type,Authorization',
-    });
-    if (req.method === 'OPTIONS') {
-      res.writeHead(204);
-      res.end();
-      return;
-    }
-    res.end(
-      JSON.stringify({
-        error: 'API Initialization Failed',
-        message: err instanceof Error ? err.message : String(err),
-        stack: err instanceof Error ? err.stack : undefined,
-      }),
-    );
+// Only bootstrap standalone HTTP server when not in Vercel serverless environment
+if (!process.env['VERCEL']) {
+  bootstrap().catch((err: unknown) => {
+    console.error('Failed to start API:', err);
   });
-  const port = Number(process.env['PORT'] ?? 3000);
-  server.listen(port, '0.0.0.0');
-});
+}
 
 export { NestFactory, createNestApp, handler };
 export default handler;
