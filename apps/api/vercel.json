@@ -1,13 +1,6 @@
 {
   "version": 2,
-  "framework": null,
-  "installCommand": "pnpm install --frozen-lockfile",
   "buildCommand": "pnpm build",
-  "functions": {
-    "api/index.js": {
-      "includeFiles": "dist/**"
-    }
-  },
   "headers": [
     {
       "source": "/api/v1/(.*)",
@@ -27,12 +20,6 @@
         { "key": "Access-Control-Allow-Origin", "value": "*" },
         { "key": "Access-Control-Allow-Methods", "value": "GET,OPTIONS" }
       ]
-    }
-  ],
-  "rewrites": [
-    {
-      "source": "/(.*)",
-      "destination": "/api/index.js"
     }
   ]
 }
