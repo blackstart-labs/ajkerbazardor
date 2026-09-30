@@ -53,4 +53,16 @@ export class DashboardReadController {
     const data = await this.dashboardService.getHeatmap(days !== undefined ? parseInt(days, 10) : 14, date);
     return { ok: true, data };
   }
+
+  @Get('analytics-report')
+  @ApiOperation({ summary: 'Get Bengali editorial analytics report for the latest or selected report date' })
+  @ApiQuery({ name: 'date', required: false, description: 'Optional report date (YYYY-MM-DD)' })
+  @ApiResponse({
+    status: 200,
+    description: 'Bengali analytics report with summary, category, and data-quality insights',
+  })
+  async getAnalyticsReport(@Query('date') date?: string) {
+    const data = await this.dashboardService.getAnalyticsReport(date);
+    return { ok: true, data };
+  }
 }

@@ -1,11 +1,20 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, watch } from 'vue';
 import { useRoute, RouterLink } from 'vue-router';
-import { apiGet, apiPost } from '../api/client';
+import { apiGet, apiPost, getApiTargetMode, setApiTargetMode, getApiBase, type ApiTargetMode } from '../api/client';
 import { formatBnDate, formatBnInt, formatTaka } from '@ajkerbazardor/shared';
 
 const route = useRoute();
 const currentRouteName = computed(() => String(route.name ?? 'Settings'));
+
+const apiTarget = ref<ApiTargetMode>(getApiTargetMode());
+const currentBaseUrl = computed(() => getApiBase());
+
+function changeTarget(mode: ApiTargetMode) {
+  apiTarget.value = mode;
+  setApiTargetMode(mode);
+  loadRouteData();
+}
 
 // ── State ──────────────────────────────────────────────────────────────────
 const loading = ref(false);
@@ -435,6 +444,47 @@ onMounted(() => {
     <!-- ── 5. SETTINGS / SYSTEM TAB ──────────────────────────────────────── -->
     <section v-else class="content-section">
       <div class="system-grid">
+        <!-- Target Switcher Card -->
+        <div class="sys-card sys-card--highlight">
+          <div class="sys-card__head">
+            <div class="sys-title-wrap">
+              <span class="sys-icon">🔀</span>
+              <h3 class="sys-title">API টার্গেট কন্ট্রোল (Local / Live)</h3>
+            </div>
+            <span class="badge" :class="apiTarget === 'local' ? 'badge--success' : 'badge--neutral'">
+              {{ apiTarget === 'local' ? 'লোকাল মোড' : 'লাইভ ক্লাউড' }}
+            </span>
+          </div>
+          <div class="sys-body">
+            <div class="target-switch-container">
+              <button
+                type="button"
+                class="switch-pill-btn"
+                :class="{ 'switch-pill-btn--active': apiTarget === 'local' }"
+                @click="changeTarget('local')"
+              >
+                💻 লোকাল (localhost:3000)
+              </button>
+              <button
+                type="button"
+                class="switch-pill-btn"
+                :class="{ 'switch-pill-btn--active': apiTarget === 'live' }"
+                @click="changeTarget('live')"
+              >
+                🌐 লাইভ (Vercel Cloud)
+              </button>
+            </div>
+            <div class="sys-row">
+              <span class="sys-label">বর্তমান সক্রিয় URL:</span>
+              <code class="font-mono text-coral font-bold">{{ currentBaseUrl }}</code>
+            </div>
+            <div class="sys-row">
+              <span class="sys-label">কন্ট্রোল স্ট্যাটাস:</span>
+              <span class="text-success font-bold font-bn">সুইচার সক্রিয় ও কার্যকরী</span>
+            </div>
+          </div>
+        </div>
+
         <div class="sys-card">
           <div class="sys-card__head">
             <div class="sys-title-wrap">
@@ -1110,6 +1160,48 @@ onMounted(() => {
 
 .sys-label {
   color: var(--color-text-muted);
+}
+
+.sys-card--highlight {
+  border-color: var(--color-coral-border);
+  box-shadow: 0 6px 24px rgba(255, 107, 74, 0.08);
+}
+
+.target-switch-container {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem;
+  background: var(--color-bg-canvas);
+  padding: 4px;
+  border-radius: 9999px;
+  border: 1px solid var(--color-border-strong);
+  margin-bottom: 0.5rem;
+}
+
+.switch-pill-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.65rem 0.85rem;
+  border-radius: 9999px;
+  border: none;
+  background: transparent;
+  color: var(--color-text-secondary);
+  font-size: var(--text-xs);
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  white-space: nowrap;
+}
+
+.switch-pill-btn:hover {
+  color: var(--color-text-primary);
+}
+
+.switch-pill-btn--active {
+  background: var(--color-coral-gradient) !important;
+  color: #fff !important;
+  box-shadow: 0 4px 14px rgba(244, 68, 46, 0.28);
 }
 
 /* Skeletons */

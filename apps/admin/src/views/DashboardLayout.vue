@@ -50,6 +50,17 @@ function isActive(path: string) {
   return route.path.startsWith(path);
 }
 
+import { getApiTargetMode, setApiTargetMode, type ApiTargetMode } from '../api/client';
+
+const apiTarget = ref<ApiTargetMode>(getApiTargetMode());
+
+function toggleApiTarget() {
+  const next: ApiTargetMode = apiTarget.value === 'local' ? 'live' : 'local';
+  apiTarget.value = next;
+  setApiTargetMode(next);
+  window.location.reload();
+}
+
 const userInitials = computed(() => {
   const email = auth.user?.email || 'Admin';
   return email.slice(0, 2).toUpperCase();
@@ -58,6 +69,14 @@ const userInitials = computed(() => {
 const userDisplayName = computed(() => {
   if (!auth.user?.email) return 'অ্যাডমিন ইউজার';
   return auth.user.email.split('@')[0];
+});
+
+onMounted(() => {
+  const handler = (e: Event) => {
+    const detail = (e as CustomEvent<ApiTargetMode>).detail;
+    if (detail) apiTarget.value = detail;
+  };
+  window.addEventListener('admin_api_target_changed', handler);
 });
 </script>
 
@@ -193,6 +212,22 @@ const userDisplayName = computed(() => {
 
         <!-- Right Quick Actions -->
         <div class="admin-header__actions">
+          <!-- API Target Switcher Pill -->
+          <button
+            type="button"
+            class="target-pill font-bn"
+            :class="apiTarget === 'local' ? 'target-pill--local' : 'target-pill--live'"
+            :title="
+              apiTarget === 'local'
+                ? 'কানেক্টেড: লোকাল API (localhost:3000) • ক্লিক করে লাইভ সার্ভারে স্যুইচ করুন'
+                : 'কানেক্টেড: লাইভ API (Vercel) • ক্লিক করে লোকাল সার্ভারে স্যুইচ করুন'
+            "
+            @click="toggleApiTarget"
+          >
+            <span class="target-indicator-dot" />
+            <span>{{ apiTarget === 'local' ? '💻 Local (3000)' : '🌐 Live Cloud' }}</span>
+          </button>
+
           <!-- Live Date Pill -->
           <div class="date-pill font-bn">
             <span class="live-dot" />
@@ -547,6 +582,64 @@ const userDisplayName = computed(() => {
   align-items: center;
   gap: 10px;
   flex-wrap: wrap;
+}
+
+.target-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 14px;
+  border-radius: 9999px;
+  background: var(--color-bg-surface);
+  border: 1.5px solid var(--color-border-subtle);
+  font-size: var(--text-xs);
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+}
+
+.target-pill:hover {
+  transform: translateY(-1px);
+}
+
+.target-pill--local {
+  color: #065f46;
+  background: #ecfdf5;
+  border-color: #a7f3d0;
+}
+
+.target-pill--local:hover {
+  background: #d1fae5;
+  border-color: #6ee7b7;
+}
+
+.target-pill--local .target-indicator-dot {
+  background: var(--color-accent-green);
+  box-shadow: 0 0 0 2px var(--color-accent-green-subtle);
+}
+
+.target-pill--live {
+  color: #1e40af;
+  background: #eff6ff;
+  border-color: #bfdbfe;
+}
+
+.target-pill--live:hover {
+  background: #dbeafe;
+  border-color: #93c5fd;
+}
+
+.target-pill--live .target-indicator-dot {
+  background: #2563eb;
+  box-shadow: 0 0 0 2px #dbeafe;
+}
+
+.target-indicator-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
 }
 
 .date-pill {
