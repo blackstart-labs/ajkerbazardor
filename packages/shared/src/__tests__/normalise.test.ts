@@ -91,4 +91,8 @@ describe('normaliseGroup()', () => {
   it('strips trailing : from "মাছ ও গোশত:"', () => {
     expect(normaliseGroup('মাছ ও গোশত:')).toBe('মাছ ও গোশত');
   });
+
+  it('strips both leading and trailing punctuation cleanly', () => {
+    expect(normaliseGroup(' :ঃ।চাল ও আটা:ঃ। ')).toBe('চাল ও আটা');
+  });
 });

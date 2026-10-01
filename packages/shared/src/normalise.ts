@@ -115,7 +115,7 @@ export function productKey(rawName: string, rawUnit: string): string {
 export function normaliseGroup(raw: string): string {
   let s = raw.trim();
   // Strip leading/trailing punctuation and spaces used inconsistently
-  s = s.replace(/^[\s:ঃ।]+|[\s:ঃ।]+$/g, '');
+  s = s.replace(/^[\s:ঃ।]+/, '').replace(/[\s:ঃ।]+$/, '');
   s = s.replace(/\s+/g, ' ');
   return s;
 }

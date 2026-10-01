@@ -26,9 +26,10 @@ function onSubmit() {
       <!-- Navigation links -->
       <nav class="site-header__nav" aria-label="প্রধান নেভিগেশন">
         <NuxtLink to="/prices" class="site-header__nav-link">বাজারদর</NuxtLink>
-        <NuxtLink to="/markets" class="site-header__nav-link">বাজার</NuxtLink>
+        <NuxtLink to="/markets" class="site-header__nav-link">বাজারসমূহ</NuxtLink>
         <NuxtLink to="/changes" class="site-header__nav-link">পরিবর্তন</NuxtLink>
-        <NuxtLink to="/about" class="site-header__nav-link">উৎস ও পদ্ধতি</NuxtLink>
+        <NuxtLink to="/analytics" class="site-header__nav-link">রিপোর্ট</NuxtLink>
+        <NuxtLink to="/about" class="site-header__nav-link">তথ্য</NuxtLink>
       </nav>
 
       <!-- Live date badge -->
@@ -64,14 +65,6 @@ function onSubmit() {
           </svg>
         </button>
       </form>
-
-      <nav class="site-header__nav" aria-label="প্রধান নেভিগেশন">
-        <NuxtLink to="/prices">বাজারদর</NuxtLink>
-        <NuxtLink to="/markets">বাজারসমূহ</NuxtLink>
-        <NuxtLink to="/changes">পরিবর্তন</NuxtLink>
-        <NuxtLink to="/analytics">রিপোর্ট</NuxtLink>
-        <NuxtLink to="/about">তথ্য</NuxtLink>
-      </nav>
     </div>
   </header>
 </template>
@@ -291,25 +284,6 @@ function onSubmit() {
 }
 
 .site-header__search-btn:hover {
-  color: var(--color-brand-primary);
-}
-
-.site-header__nav {
-  display: flex;
-  align-items: center;
-  gap: var(--space-3);
-  font-size: var(--text-sm);
-  font-weight: 700;
-  white-space: nowrap;
-}
-
-.site-header__nav a {
-  color: var(--color-text-secondary);
-  text-decoration: none;
-}
-
-.site-header__nav a:hover,
-.site-header__nav a.router-link-active {
   color: var(--color-brand-primary);
 }
 
